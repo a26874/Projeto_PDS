@@ -21,9 +21,9 @@ namespace ProjetoPDS.Classes
                 dynamic sys = Py.Import("sys");
 
                 // Append the directory containing teste.py to the Python path
-                sys.path.append(@"D:\Universidade\2ºAno\PDS\ProjetoPDS\ProjetoPDS\FaceRecognition\face\recognition\");
+                sys.path.append(@"C:\Users\marco\source\repos\Projeto_PDS\ProjetoPDS\FaceRecognition");
 
-                dynamic facilRecMod = Py.Import("__init__");
+                dynamic facilRecMod = Py.Import("recognition");
                 dynamic loadEncFunc= facilRecMod.recognition;
 
                 dynamic auxEncoding = loadEncFunc(pathToFile);
@@ -34,9 +34,7 @@ namespace ProjetoPDS.Classes
 
             }
         }
-        //public void Shutdown()
-        //{
-        //    PythonEngine.Shutdown();
-        //}
+
+        
     }
 }
