@@ -42,9 +42,9 @@ namespace ProjetoPDS.Controllers
                     await utente.Foto.CopyToAsync(stream);
                 }
 
-            ReconhecimentoFacial novoReconhecimento = new ReconhecimentoFacial();
+            FotoComDesfoque novoReconhecimento = new FotoComDesfoque();
 
-            var binaryEncoding = novoReconhecimento.getFacialEncoding(filePath);
+            var binaryEncoding = novoReconhecimento.IdentificarUtentes(filePath);
             Encoding novoEncoding = new Encoding();
             novoEncoding.encoding = binaryEncoding;
             var existeUtente = baseDados.Utente.FirstOrDefault(u => u.Nome == utente.Nome);
@@ -83,9 +83,9 @@ namespace ProjetoPDS.Controllers
             if (!Path.Exists(filePath))
                 return BadRequest();
 
-            ReconhecimentoFacial novoReconhecimento = new ReconhecimentoFacial();
+            FotoComDesfoque novoReconhecimento = new FotoComDesfoque();
 
-            var binaryEncoding = novoReconhecimento.getFacialEncoding(filePath);
+            var binaryEncoding = novoReconhecimento.IdentificarUtentes(filePath);
 
             var todosEncoding = baseDados.Encoding.ToList();
             
@@ -111,13 +111,6 @@ namespace ProjetoPDS.Controllers
             auxUtente.Sala = infoUtente.Sala;
             auxUtente.Autorizacao = infoUtente.Autorizacao;
             return Ok(auxUtente);
-        }
-        [HttpGet]
-        public async Task<IActionResult> obterUtente([FromForm] Utente utente)
-        {
-
-
-            return Ok();
         }
     }
 }

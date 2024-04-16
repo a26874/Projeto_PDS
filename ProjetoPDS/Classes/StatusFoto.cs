@@ -1,9 +1,9 @@
 ﻿/*
-*	<copyright file="LocalPublicacao" company="IPCA">
+*	<copyright file="StatusFoto" company="IPCA">
 *	</copyright>
 * 	<author>Marco Macedo</author>
 *	<contact>a26874@alunos.ipca.pt</contact>
-*   <date>2024 4/14/2024 4:01:01 PM</date>
+*   <date>2024 4/14/2024 4:11:43 PM</date>
 *	<description></description>
 **/
 
@@ -11,11 +11,10 @@ using System.ComponentModel.DataAnnotations;
 
 namespace ProjetoPDS.Classes
 {
-    public enum LocalPublicacao
+    public enum StatusFoto
     {
-        SALA,
-        GALERIA,
-        MURAL,
-        CHAT
+        COMPLETO,
+        PROCESSANDO,
+        ERRO
     }
 }

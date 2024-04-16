@@ -1,5 +1,5 @@
 ﻿/*
-*	<copyright file="Publicacao" company="IPCA">
+*	<copyright file="InfoPublicacao" company="IPCA">
 *	</copyright>
 * 	<author>Marco Macedo</author>
 *	<contact>a26874@alunos.ipca.pt</contact>
@@ -8,10 +8,11 @@
 **/
 
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ProjetoPDS.Classes
 {
-    public class Publicacao
+    public class InfoPublicacao
     {
         #region ATRIBUTOS
         [Key]
@@ -20,13 +21,16 @@ namespace ProjetoPDS.Classes
         private DateTime dataPublicacao;
         private LocalPublicacao local;
         private string dataResult;
+        private List<FotoOrigem> listaFotosOrigem;
         private string caminhoFoto;
+        [NotMapped]
+        private IFormFile foto;
         #endregion
 
         #region COMPORTAMENTO
 
         #region CONSTRUTORES
-        public Publicacao()
+        public InfoPublicacao()
         {
 
         }
@@ -80,6 +84,14 @@ namespace ProjetoPDS.Classes
         {
             get { return caminhoFoto;}
             set { caminhoFoto = value;}
+        }
+        /// <summary>
+        /// Obter a foto da publicação
+        /// </summary>
+        public IFormFile Foto
+        {
+            get { return foto; }
+            set { foto = value; }
         }
         #endregion
 

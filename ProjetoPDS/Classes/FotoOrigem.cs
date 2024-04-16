@@ -1,9 +1,9 @@
 ﻿/*
-*	<copyright file="FotoStatus" company="IPCA">
+*	<copyright file="FotoOrigem" company="IPCA">
 *	</copyright>
 * 	<author>Marco Macedo</author>
 *	<contact>a26874@alunos.ipca.pt</contact>
-*   <date>2024 4/14/2024 4:11:43 PM</date>
+*   <date>2024 4/14/2024 4:10:18 PM</date>
 *	<description></description>
 **/
 
@@ -11,18 +11,18 @@ using System.ComponentModel.DataAnnotations;
 
 namespace ProjetoPDS.Classes
 {
-    public class FotoStatus
+    public class FotoOrigem
     {
         #region ATRIBUTOS
         [Key]
         private int id;
-        private string estado;
+        private string fotoUrl;
         #endregion
 
         #region COMPORTAMENTO
 
         #region CONSTRUTORES
-        public FotoStatus()
+        public FotoOrigem()
         {
 
         }
@@ -30,7 +30,7 @@ namespace ProjetoPDS.Classes
 
         #region PROPRIEDADES
         /// <summary>
-        /// Obter o id de estado da foto.
+        /// Obter o id da foto.
         /// </summary>
         public int Id
         {
@@ -38,12 +38,12 @@ namespace ProjetoPDS.Classes
             set { id = value; }
         }
         /// <summary>
-        /// Obter o estado da foto.
+        /// Obter o url da foto.
         /// </summary>
-        public string Estado
+        public string URL
         {
-            get { return estado; }
-            set { estado = value; }
+            get { return fotoUrl; }
+            set { fotoUrl = value; }
         }
         #endregion
 

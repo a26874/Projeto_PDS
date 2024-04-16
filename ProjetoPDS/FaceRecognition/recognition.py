@@ -1,6 +1,7 @@
 import face_recognition
 import cv2
 import pickle
+import json
 
 def location(image_location):
     # enviar localizações para a main
@@ -9,12 +10,17 @@ def location(image_location):
 
 
 def recognition(pathToFile):
+    encodingList = {}
     try:
         image_face = face_recognition.load_image_file(pathToFile)
         face_location = face_recognition.face_locations(image_face)
-        face_encodings = face_recognition.face_encodings(image_face, face_location)
-        face_encoding_binary = pickle.dumps(face_encodings)
-        return face_encoding_binary
+        for i, face in enumerate(face_location):
+            face = face_recognition.face_encodings(image_face, [face])[0]
+            face_binary = pickle.dumps(face)
+            encodingList[i] =face_binary
+
+        # face_encoding_list_json = json.dumps(encodingList)
+        return encodingList
     except IndexError:
         print("I wasn't able to locate any faces in at least one of the images. Check the image files. Aborting...")
         quit()
