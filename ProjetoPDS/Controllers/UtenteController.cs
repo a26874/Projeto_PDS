@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Http;
 using ProjetoPDS.Classes;
 using Python.Runtime;
+using System.Linq;
 
 namespace ProjetoPDS.Controllers
 {
@@ -28,8 +29,8 @@ namespace ProjetoPDS.Controllers
         /// <param name="utente"></param>
         /// <returns></returns>
         [HttpPost]
-        [Route("addUtente")]
-        public async Task<IActionResult> addUtentes([FromForm] Utente utente)
+        [Route("addSingleUtente")]
+        public async Task<IActionResult> addSingleUtente([FromForm] Utente utente)
         {
             if (utente == null)
                 return BadRequest();
@@ -44,7 +45,7 @@ namespace ProjetoPDS.Controllers
 
             FotoComDesfoque novoReconhecimento = new FotoComDesfoque();
 
-            var binaryEncoding = novoReconhecimento.IdentificarUtentes(filePath);
+            var binaryEncoding = novoReconhecimento.addUtente(filePath);
             Encoding novoEncoding = new Encoding();
             novoEncoding.encoding = binaryEncoding;
             var existeUtente = baseDados.Utente.FirstOrDefault(u => u.Nome == utente.Nome);
@@ -70,47 +71,47 @@ namespace ProjetoPDS.Controllers
         /// </summary>
         /// <param name="utente"></param>
         /// <returns></returns>
-        [HttpPost]
-        [Route("verificarUtente")]
-        public async Task<IActionResult> verificarUtente([FromForm] UtenteVerificar utente)
-        {
-            int idUtente = 0;
-            if (utente == null)
-                return BadRequest();
-            string fileName = Path.GetFileName(utente.Foto.FileName);
-            string filePath = Path.Combine(guardarFotoCaminho, fileName);
+        //[HttpPost]
+        //[Route("verificarUtente")]
+        //public async Task<IActionResult> verificarUtente([FromForm] UtenteVerificar utente)
+        //{
+        //    int idUtente = 0;
+        //    if (utente == null)
+        //        return BadRequest();
+        //    string fileName = Path.GetFileName(utente.Foto.FileName);
+        //    string filePath = Path.Combine(guardarFotoCaminho, fileName);
 
-            if (!Path.Exists(filePath))
-                return BadRequest();
+        //    if (!Path.Exists(filePath))
+        //        return BadRequest();
 
-            FotoComDesfoque novoReconhecimento = new FotoComDesfoque();
+        //    FotoComDesfoque novoReconhecimento = new FotoComDesfoque();
 
-            var binaryEncoding = novoReconhecimento.IdentificarUtentes(filePath);
+        //    var binaryEncoding = novoReconhecimento.IdentificarUtentes(filePath);
 
-            var todosEncoding = baseDados.Encoding.ToList();
-            
-            foreach(Encoding encodingValue in todosEncoding)
-            {
-                if (encodingValue.encoding.SequenceEqual(binaryEncoding))
-                {
-                    idUtente = encodingValue.UTENTEidUtente;
-                    break;
-                }
-            }
-            if (idUtente == 0)
-                return BadRequest();
+        //    var todosEncoding = baseDados.Encoding.ToList();
+        //    foreach(Encoding encodingValue in todosEncoding)
+        //    {
+        //        if (encodingValue.encoding.SequenceEqual(binaryEncoding))
+        //        {
+        //            idUtente = encodingValue.UTENTEidUtente;
+        //            break;
+        //        }
+        //    }
+        //    if (idUtente == 0)
+        //        return BadRequest();
 
-            Utente auxUtente= new Utente();
+        //    Utente auxUtente= new Utente();
 
-            var infoUtente = baseDados.Utente.FirstOrDefault(u => u.idUtente == idUtente);
-            if (infoUtente == null)
-                return BadRequest("Nao existe.");
-            auxUtente.idUtente = infoUtente.idUtente;
-            auxUtente.Nome = infoUtente.Nome;
-            auxUtente.Valencia = infoUtente.Valencia;
-            auxUtente.Sala = infoUtente.Sala;
-            auxUtente.Autorizacao = infoUtente.Autorizacao;
-            return Ok(auxUtente);
-        }
+        //    var infoUtente = baseDados.Utente.FirstOrDefault(u => u.idUtente == idUtente);
+        //    if (infoUtente == null)
+        //        return BadRequest("Nao existe.");
+        //    auxUtente.idUtente = infoUtente.idUtente;
+        //    auxUtente.Nome = infoUtente.Nome;
+        //    auxUtente.Valencia = infoUtente.Valencia;
+        //    auxUtente.Sala = infoUtente.Sala;
+        //    auxUtente.Autorizacao = infoUtente.Autorizacao;
+        //    return Ok(auxUtente);
+        //}
     }
+    
 }

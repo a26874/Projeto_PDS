@@ -8,19 +8,20 @@
 **/
 
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ProjetoPDS.Classes
 {
     public class UtenteIdentificado
     {
         #region ATRIBUTOS
-        [Key]
         private int id;
         private string nome;
-        private int cordX;
-        private int cordY;
-        private int rectLargura;
-        private int rectAltura;
+        private int cordTop;
+        private int cordBottom;
+        private int cordRight;
+        private int cordLeft;
+        private Encoding encoding;
         #endregion
 
         #region COMPORTAMENTO
@@ -33,21 +34,14 @@ namespace ProjetoPDS.Classes
         {
 
         }
-        /// <summary>
-        /// Construtor por parametros.
-        /// </summary>
-        /// <param name="nome"></param>
-        /// <param name="cordX"></param>
-        /// <param name="cordY"></param>
-        /// <param name="rectLargura"></param>
-        /// <param name="rectAltura"></param>
-        public UtenteIdentificado(string nome, int cordX, int cordY, int rectLargura, int rectAltura)
+        public UtenteIdentificado(int id, string nome, int cordTop, int cordBottom, int cordRight, int cordLeft, Encoding encoding, int top, int bottom, int right, int left)
         {
             this.nome = nome;
-            this.cordX = cordX;
-            this.cordY = cordY;
-            this.rectLargura = rectLargura;
-            this.rectAltura = rectAltura;
+            this.cordTop = cordTop;
+            this.cordBottom = cordBottom;
+            this.cordRight = cordRight;
+            this.cordLeft = cordLeft;
+            this.encoding = encoding;
         }
 
         #endregion
@@ -61,6 +55,54 @@ namespace ProjetoPDS.Classes
         {
             get { return id; }
             set { id = value; }
+        }
+        /// <summary>
+        /// Obter o nome de um utente identificado.
+        /// </summary>
+        public string Nome
+        {
+            get { return nome; }
+            set { nome = value; }
+        }
+        /// <summary>
+        /// Obter cord top
+        /// </summary>
+        public int Top
+        {
+            get { return cordTop; }
+            set { cordTop = value; }
+        }
+        /// <summary>
+        /// Obter cord bottom
+        /// </summary>
+        public int Bottom
+        {
+            get { return cordBottom; }
+            set { cordBottom = value; }
+        }
+        /// <summary>
+        /// Obter cord right
+        /// </summary>
+        public int Right
+        {
+            get { return cordRight; }
+            set { cordRight = value; }
+        }
+        /// <summary>
+        /// Obter cord left
+        /// </summary>
+        public int Left
+        {
+            get { return cordLeft; }
+            set { cordLeft = value; }
+        }
+        /// <summary>
+        /// Retorna o encoding
+        /// </summary>
+        public Encoding Encoding
+        {
+            get { return encoding; }
+            set { encoding = value; }
         }
         #endregion
 

@@ -2,7 +2,7 @@ import face_recognition
 import cv2
 import pickle
 import json
-
+import numpy as np
 def location(image_location):
     # enviar localizações para a main
     face_location = face_recognition.face_locations(image_location, model="cnn")
@@ -13,25 +13,38 @@ def recognition(pathToFile):
     encodingList = {}
     try:
         image_face = face_recognition.load_image_file(pathToFile)
-        face_location = face_recognition.face_locations(image_face)
-        for i, face in enumerate(face_location):
-            face = face_recognition.face_encodings(image_face, [face])[0]
-            face_binary = pickle.dumps(face)
-            encodingList[i] =face_binary
+        face_locations = face_recognition.face_locations(image_face)
+        for face in face_locations:
+            face_encoding = face_recognition.face_encodings(image_face, [face])[0]
+            face_encoding_binary = pickle.dumps(face_encoding)
+            encodingList[face] = face_encoding_binary
 
-        # face_encoding_list_json = json.dumps(encodingList)
         return encodingList
     except IndexError:
         print("I wasn't able to locate any faces in at least one of the images. Check the image files. Aborting...")
         quit()
 
 
-# def reverseBinary(binaryEncoding):
-#     try:
-#         normalEncoding = pickle.load(binaryEncoding)
-#         return normalEncoding
-#     except:
-#         print("Invalid encoding.")
+def singleRecognition(pathToFile):
+    try:
+        image_face = face_recognition.load_image_file(pathToFile)
+        face_location = face_recognition.face_locations(image_face)
+        face_encoding = face_recognition.face_encodings(image_face, face_location)
+        face_encoding_binary = pickle.dumps(face_encoding)
+        
+        return face_encoding_binary
+    except IndexError:
+        print("asd")
+        
+        
+def compareEncoding(encoding1, encoding2):
+    try:
+        face_encoding_1 = pickle.loads(encoding1)
+        face_encoding_2 = pickle.loads(encoding2)
+        results = face_recognition.compare_faces([face_encoding_1], face_encoding_2)
+        return str(np.any(results))
+    except IndexError:
+        print('asd')
 
 
 def face_compare(face_location, imagecv2, imageface, people_list,images_face_encodings, resize):

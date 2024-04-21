@@ -22,9 +22,9 @@ namespace ProjetoPDS.Controllers
 
         [HttpPost]
         [Route("VerificarPublicacao")]
-        public async Task<IActionResult> VerificarPublicacao([FromForm] InfoPublicacao pub)
+        public async Task<IActionResult> VerificarPublicacao([FromForm] Publicacao pub)
         {
-            if (pub == null)
+            if (pub == null || pub.Foto == null)
                 return BadRequest();
             string nomeFicheiro = Path.GetFileName(pub.Foto.FileName);
             string nomeDiretorio = Path.Combine(guardarFotoCaminho, nomeFicheiro);
@@ -36,7 +36,31 @@ namespace ProjetoPDS.Controllers
                 }
 
             FotoComDesfoque novoDesfoque = new FotoComDesfoque();
+            
+            List<UtenteIdentificado> utentesIdentificados = novoDesfoque.IdentificarUtentes(nomeDiretorio);
+            var todosEncoding = baseDados.Encoding.ToList();
 
+            int idUtente = 0;
+            foreach(UtenteIdentificado utente in utentesIdentificados)
+            {
+                if (utente == null)
+                    continue;
+                foreach(Encoding encodingValue in todosEncoding)
+                {
+                    if(novoDesfoque.verificarEncoding(encodingValue.encoding, utente.Encoding.encoding))
+                    {
+                        idUtente = encodingValue.UTENTEidUtente;
+                        var infoUtente = baseDados.Utente.FirstOrDefault(u => u.idUtente == idUtente);
+                        if (infoUtente != null)
+                        {
+                            utente.Nome = infoUtente.Nome;
+                            utente.Id = infoUtente.idUtente;
+                        }
+                        break;
+                    }
+                }
+            }
+            
             return Ok();
         }
 

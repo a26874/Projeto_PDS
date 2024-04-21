@@ -11,6 +11,7 @@ using Python.Runtime;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 using Newtonsoft.Json;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace ProjetoPDS.Classes
 {
@@ -87,7 +88,7 @@ namespace ProjetoPDS.Classes
         public int NumUtentes
         {
             get { return numUtentes; }
-            set { numUtentes = value;}
+            set { numUtentes = value; }
         }
         /// <summary>
         /// Obter o numero de utentes processados
@@ -114,14 +115,13 @@ namespace ProjetoPDS.Classes
         /// </summary>
         /// <param name="pathToFile"></param>
         /// <returns></returns>
-        public byte[] IdentificarUtentes(string pathToFile)
+        public List<UtenteIdentificado> IdentificarUtentes(string pathToFile)
         {
             PythonEngine.Initialize();
             using (Py.GIL())
             {
                 dynamic sys = Py.Import("sys");
 
-                // Append the directory containing teste.py to the Python path
                 sys.path.append(@"C:\Users\marco\source\repos\Projeto_PDS\ProjetoPDS\FaceRecognition");
 
                 dynamic facilRecMod = Py.Import("recognition");
@@ -130,21 +130,75 @@ namespace ProjetoPDS.Classes
                 dynamic auxEncoding = loadEncFunc(pathToFile);
 
 
-                var values = JsonConvert.DeserializeObject<Dictionary<int, byte[]>>(auxEncoding);
+                Dictionary<string, byte[]> encodingDict = new Dictionary<string, byte[]>();
 
-                List<Encoding> listaEncodings = new List<Encoding>();
-                foreach(int a in auxEncoding)
+                foreach (PyObject key in auxEncoding)
                 {
-                   
+                    string faceLocation = key.ToString();
+                    byte[] encoding = auxEncoding[key].As<byte[]>();
+                    encodingDict.Add(faceLocation, encoding);
                 }
-                byte[] encoding = (byte[])auxEncoding;
 
+                List<UtenteIdentificado> utentesIdentificados = new List<UtenteIdentificado>();
+                foreach (var key in encodingDict)
+                {
+                    string[] parts = key.Key.Trim('(', ')').Split(',');
+                    UtenteIdentificado novoUtente = new UtenteIdentificado();
+                    novoUtente.Top = int.Parse(parts[0].Trim());
+                    novoUtente.Right = int.Parse(parts[2].Trim());
+                    novoUtente.Bottom = int.Parse(parts[3].Trim());
+                    novoUtente.Left = int.Parse(parts[1].Trim());
+                    novoUtente.Encoding = new Encoding();
+                    novoUtente.Encoding.encoding = key.Value;
+                    utentesIdentificados.Add(novoUtente);
+                }
+                return utentesIdentificados;
+            }
+        }
+        /// <summary>
+        /// Retorna um encoding sozinho.
+        /// </summary>
+        /// <param name="pathToFile"></param>
+        /// <returns></returns>
+        public byte[] addUtente(string pathToFile)
+        {
+            PythonEngine.Initialize();
+            using (Py.GIL())
+            {
+                dynamic sys = Py.Import("sys");
+
+                sys.path.append(@"C:\Users\marco\source\repos\Projeto_PDS\ProjetoPDS\FaceRecognition");
+
+                dynamic facilRecMod = Py.Import("recognition");
+                dynamic loadEncFunc = facilRecMod.singleRecognition;
+
+                dynamic auxEncoding = loadEncFunc(pathToFile);
+
+                byte[] encoding = auxEncoding;
                 return encoding;
             }
         }
+        public bool verificarEncoding(byte[]encoding1, byte[]encoding2)
+        {
+            PythonEngine.Initialize();
+            using(Py.GIL())
+            {
+                dynamic sys = Py.Import("sys");
+                sys.path.append(@"C:\Users\marco\source\repos\Projeto_PDS\ProjetoPDS\FaceRecognition");
 
-        #endregion
+                dynamic facilRecMod = Py.Import("recognition");
+                dynamic loadEncFunc = facilRecMod.compareEncoding;
 
-        #endregion
+                dynamic auxCompare = loadEncFunc(encoding1, encoding2);
+
+                bool exists = false;
+                string auxExist= auxCompare;
+                if (auxExist == "True")
+                    exists = true;
+                return exists;
+            }
+        }
+            #endregion
+            #endregion
     }
 }
