@@ -19,13 +19,11 @@ namespace ProjetoPDS.Classes
         private int id;
         private int idUtilizador;
         private DateTime dataPublicacao;
-        [NotMapped]
         private LocalPublicacao local;
         private List<FotoOrigem> listaFotosOrigem;
         [NotMapped]
         private IFormFile foto;
-        //[NotMapped]
-        //private string caminhoFoto;
+        private string? caminhoFoto;
         //[NotMapped]
         //private string dataResult;
         #endregion
@@ -33,10 +31,34 @@ namespace ProjetoPDS.Classes
         #region COMPORTAMENTO
 
         #region CONSTRUTORES
+        /// <summary>
+        /// Construtor por defeito.
+        /// </summary>
         public Publicacao()
         {
 
         }
+        /// <summary>
+        /// Construtor com parametros.
+        /// </summary>
+        /// <param name="idPub"></param>
+        /// <param name="idUtlz"></param>
+        /// <param name="dataPub"></param>
+        /// <param name="localPostagem"></param>
+        /// <param name="listaFotosOrigem"></param>
+        /// <param name="fotoPub"></param>
+        /// <param name="caminhoFoto"></param>
+        public Publicacao(int idPub, int idUtlz, DateTime dataPub, LocalPublicacao localPostagem, List<FotoOrigem> listaFotosOrigem, IFormFile fotoPub, string caminhoFoto)
+        {
+            id = idPub;
+            idUtilizador= idUtlz;
+            dataPublicacao= dataPub;
+            local = localPostagem;
+            this.listaFotosOrigem = listaFotosOrigem;
+            foto = fotoPub;
+            this.caminhoFoto = caminhoFoto;
+        }
+
         #endregion
 
         #region PROPRIEDADES
@@ -76,8 +98,7 @@ namespace ProjetoPDS.Classes
         /// <summary>
         /// Obter o local de publicação da foto.
         /// </summary>
-        [NotMapped]
-        public LocalPublicacao Local
+        public LocalPublicacao Local_Publicacaoid
         {
             get { return local; }
             set { local = value; }
@@ -85,12 +106,11 @@ namespace ProjetoPDS.Classes
         /// <summary>
         /// Obter o url da foto.
         /// </summary>
-        //[NotMapped]
-        //public string CaminhoFoto
-        //{
-        //    get { return caminhoFoto;}
-        //    set { caminhoFoto = value;}
-        //}
+        public string? CaminhoFoto
+        {
+            get { return caminhoFoto; }
+            set { caminhoFoto = value; }
+        }
         /// <summary>
         /// Obter a foto da publicação
         /// </summary>

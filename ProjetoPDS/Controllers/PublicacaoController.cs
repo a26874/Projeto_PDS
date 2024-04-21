@@ -29,12 +29,15 @@ namespace ProjetoPDS.Controllers
             string nomeFicheiro = Path.GetFileName(pub.Foto.FileName);
             string nomeDiretorio = Path.Combine(guardarFotoCaminho, nomeFicheiro);
 
+
             if (!Path.Exists(nomeDiretorio))
                 using (var stream = new FileStream(nomeDiretorio, FileMode.Create))
-                {
                     await pub.Foto.CopyToAsync(stream);
-                }
-
+            
+            pub.CaminhoFoto = nomeDiretorio;
+            
+            baseDados.Publicacao.Add(pub);
+            await baseDados.SaveChangesAsync();
             FotoComDesfoque novoDesfoque = new FotoComDesfoque();
             
             List<UtenteIdentificado> utentesIdentificados = novoDesfoque.IdentificarUtentes(nomeDiretorio);
@@ -55,12 +58,11 @@ namespace ProjetoPDS.Controllers
                         {
                             utente.Nome = infoUtente.Nome;
                             utente.Id = infoUtente.idUtente;
+                            break;
                         }
-                        break;
                     }
                 }
             }
-            
             return Ok();
         }
 

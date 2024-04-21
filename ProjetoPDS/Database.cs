@@ -27,5 +27,6 @@ namespace ProjetoPDS.Classes
 
         public DbSet<Utente> Utente { get; set; }
         public DbSet<Encoding> Encoding { get; set; }
+        public DbSet<Publicacao> Publicacao { get; set; }
     }
 }
