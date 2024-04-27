@@ -12,7 +12,11 @@ namespace ProjetoPDS.Classes
     public class UtenteVerificar
     {
         #region ATRIBUTOS
-        private IFormFile foto;
+        private int cordTop;
+        private int cordBottom;
+        private int cordRight;
+        private int cordLeft;
+        private Encoding encoding;
         #endregion
 
         #region COMPORTAMENTO
@@ -26,12 +30,44 @@ namespace ProjetoPDS.Classes
 
         #region PROPRIEDADES
         /// <summary>
-        /// Obter informação sobre a foto
+        /// Obter cord top
         /// </summary>
-        public IFormFile Foto
+        public int Top
         {
-            get { return foto; }
-            set { foto = value; }
+            get { return cordTop; }
+            set { cordTop = value; }
+        }
+        /// <summary>
+        /// Obter cord bottom
+        /// </summary>
+        public int Bottom
+        {
+            get { return cordBottom; }
+            set { cordBottom = value; }
+        }
+        /// <summary>
+        /// Obter cord right
+        /// </summary>
+        public int Right
+        {
+            get { return cordRight; }
+            set { cordRight = value; }
+        }
+        /// <summary>
+        /// Obter cord left
+        /// </summary>
+        public int Left
+        {
+            get { return cordLeft; }
+            set { cordLeft = value; }
+        }
+        /// <summary>
+        /// Retorna o encoding
+        /// </summary>
+        public Encoding Encoding
+        {
+            get { return encoding; }
+            set { encoding = value; }
         }
         #endregion
 
