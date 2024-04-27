@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using ProjetoPDS.Classes;
+using System.Collections.Generic;
 
 namespace ProjetoPDS.Controllers
 {
@@ -36,35 +38,81 @@ namespace ProjetoPDS.Controllers
             
             pub.CaminhoFoto = nomeDiretorio;
             
-            baseDados.Publicacao.Add(pub);
-            await baseDados.SaveChangesAsync();
-            FotoComDesfoque novoDesfoque = new FotoComDesfoque();
+            //baseDados.Publicacao.Add(pub);
+            //await baseDados.SaveChangesAsync();
+            FotoComDesfoque novoReconhecimento = new FotoComDesfoque();
             
-            List<UtenteIdentificado> utentesIdentificados = novoDesfoque.IdentificarUtentes(nomeDiretorio);
+            List<UtenteIdentificado> utentesIdentificados = novoReconhecimento.IdentificarUtentes(nomeDiretorio);
             var todosEncoding = baseDados.Encoding.ToList();
+            List<UtenteVerificar> utentesPorVerificar = new List<UtenteVerificar>();
 
             int idUtente = 0;
             foreach(UtenteIdentificado utente in utentesIdentificados)
             {
                 if (utente == null)
                     continue;
-                foreach(Encoding encodingValue in todosEncoding)
+                //Caso não existam encodings na base de dados.
+                if (todosEncoding.Count ==0)
                 {
-                    if(novoDesfoque.verificarEncoding(encodingValue.encoding, utente.Encoding.encoding))
+                    UtenteVerificar ut = new UtenteVerificar();
+                    ut.Right = utente.Right;
+                    ut.Left = utente.Left;
+                    ut.Top = utente.Top;
+                    ut.Bottom = utente.Bottom;
+                    ut.Encoding = utente.Encoding;
+                    utentesPorVerificar.Add(ut);
+                }
+                else
+                {
+                    foreach(Encoding encodingValue in todosEncoding)
                     {
-                        idUtente = encodingValue.UTENTEidUtente;
-                        var infoUtente = baseDados.Utente.FirstOrDefault(u => u.idUtente == idUtente);
-                        if (infoUtente != null)
+                        if(novoReconhecimento.verificarEncoding(encodingValue.encoding, utente.Encoding.encoding))
                         {
-                            utente.Nome = infoUtente.Nome;
-                            utente.Id = infoUtente.idUtente;
-                            break;
+                            idUtente = encodingValue.UTENTEidUtente;
+                            var infoUtente = baseDados.Utente.FirstOrDefault(u => u.idUtente == idUtente);
+                            if (infoUtente != null)
+                            {
+                                utente.Nome = infoUtente.Nome;
+                                utente.Id = infoUtente.idUtente;
+                            }
+                        }
+                        else
+                        {
+                            UtenteVerificar ut = new UtenteVerificar();
+                            ut.Right = utente.Right;
+                            ut.Left = utente.Left;
+                            ut.Top = utente.Top;
+                            ut.Bottom = utente.Bottom;
+                            ut.Encoding = utente.Encoding;
+                            utentesPorVerificar.Add(ut);
                         }
                     }
                 }
             }
+            string nomeDiretorioAux = "";
+            if (utentesPorVerificar.Count > 0)
+                nomeDiretorioAux = novoReconhecimento.MostrarNaoIdentificados(nomeFicheiro,nomeDiretorio, utentesPorVerificar);
+            var fotoParaVerificar = new
+            {
+                nomeFoto = nomeFicheiro,
+                listaNaoIdentificados = utentesPorVerificar,
+                fotoOriginal = nomeDiretorio,
+                diretorioFoto = nomeDiretorioAux,
+            };
+            return Ok(Json(fotoParaVerificar));
+        }
+        [HttpPost]
+        [Route("RealizarDesfoque")] 
+        public async Task<IActionResult> Desfoque([FromForm] string imagemOriginal, [FromForm] string nomeFoto, [FromForm] int posX, [FromForm] int posY, [FromForm] string utentesPorVerificar)
+        {
+            if (nomeFoto == null || posX == 0 || posY == 0 || utentesPorVerificar == null)
+                return BadRequest();    
+
+            FotoComDesfoque novoDesfoque = new FotoComDesfoque();
+            List<UtenteVerificar> listaDesfoque = JsonConvert.DeserializeObject<List<UtenteVerificar>>(utentesPorVerificar);
+            
+            novoDesfoque.AplicarDesfoque(nomeFoto, imagemOriginal, posX, posY, listaDesfoque);
             return Ok();
         }
-
     }
 }

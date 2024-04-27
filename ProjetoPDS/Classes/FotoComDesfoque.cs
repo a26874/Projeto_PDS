@@ -12,6 +12,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 using Newtonsoft.Json;
 using Microsoft.AspNetCore.Http.HttpResults;
+using System.Text;
 
 namespace ProjetoPDS.Classes
 {
@@ -135,7 +136,8 @@ namespace ProjetoPDS.Classes
                 foreach (PyObject key in auxEncoding)
                 {
                     string faceLocation = key.ToString();
-                    byte[] encoding = auxEncoding[key].As<byte[]>();
+                    string base64encoding = auxEncoding[key].ToString();
+                    byte[] encoding = Convert.FromBase64String(base64encoding);
                     encodingDict.Add(faceLocation, encoding);
                 }
 
@@ -145,9 +147,9 @@ namespace ProjetoPDS.Classes
                     string[] parts = key.Key.Trim('(', ')').Split(',');
                     UtenteIdentificado novoUtente = new UtenteIdentificado();
                     novoUtente.Top = int.Parse(parts[0].Trim());
-                    novoUtente.Right = int.Parse(parts[2].Trim());
-                    novoUtente.Bottom = int.Parse(parts[3].Trim());
-                    novoUtente.Left = int.Parse(parts[1].Trim());
+                    novoUtente.Right = int.Parse(parts[1].Trim());
+                    novoUtente.Bottom = int.Parse(parts[2].Trim());
+                    novoUtente.Left = int.Parse(parts[3].Trim());
                     novoUtente.Encoding = new Encoding();
                     novoUtente.Encoding.encoding = key.Value;
                     utentesIdentificados.Add(novoUtente);
@@ -178,10 +180,16 @@ namespace ProjetoPDS.Classes
                 return encoding;
             }
         }
-        public bool verificarEncoding(byte[]encoding1, byte[]encoding2)
+        /// <summary>
+        /// Verifica se o encoding já existe na base de dados.
+        /// </summary>
+        /// <param name="encoding1"></param>
+        /// <param name="encoding2"></param>
+        /// <returns></returns>
+        public bool verificarEncoding(byte[] encoding1, byte[] encoding2)
         {
             PythonEngine.Initialize();
-            using(Py.GIL())
+            using (Py.GIL())
             {
                 dynamic sys = Py.Import("sys");
                 sys.path.append(@"C:\Users\marco\source\repos\Projeto_PDS\ProjetoPDS\FaceRecognition");
@@ -192,13 +200,78 @@ namespace ProjetoPDS.Classes
                 dynamic auxCompare = loadEncFunc(encoding1, encoding2);
 
                 bool exists = false;
-                string auxExist= auxCompare;
+                string auxExist = auxCompare;
                 if (auxExist == "True")
                     exists = true;
                 return exists;
             }
         }
+        /// <summary>
+        /// Cria uma nova imagem que irá conter todas as caras não identificadas.
+        /// </summary>
+        /// <param name="nomeDiretorio"></param>
+        /// <param name="listaPorVerificar"></param>
+        /// <returns></returns>
+        public string MostrarNaoIdentificados(string nomeFicheiro, string nomeDiretorio, List<UtenteVerificar> listaPorVerificar)
+        {
+            PythonEngine.Initialize();
+            using (Py.GIL())
+            {
+                dynamic sys = Py.Import("sys");
+                sys.path.append(@"C:\Users\marco\source\repos\Projeto_PDS\ProjetoPDS\FaceRecognition");
+
+                dynamic facilRecMod = Py.Import("recognition");
+                dynamic loadEncFunc = facilRecMod.censure_results_2;
+                bool firstIteration = false;
+                string imagemVerificarPath = "";
+                string auxNomeFicheiro = Path.GetFileNameWithoutExtension(nomeFicheiro);
+                foreach (UtenteVerificar u in listaPorVerificar)
+                {
+                    if (!firstIteration)
+                    {
+                        dynamic execFunc = loadEncFunc(auxNomeFicheiro, nomeDiretorio, u.Left, u.Top, u.Right, u.Bottom);
+                        imagemVerificarPath = execFunc.ToString();
+                        firstIteration = true;
+                    }
+                    else
+                    {
+                        dynamic execFunc = loadEncFunc(auxNomeFicheiro, imagemVerificarPath, u.Left, u.Top, u.Right, u.Bottom);
+                    }
+                }
+                return imagemVerificarPath;
+            }
+        }
+        /// <summary>
+        /// Aplica desfoque baseado no click.
+        /// </summary>
+        /// <param name="nomeFicheiro"></param>
+        /// <param name="nomeDiretorio"></param>
+        /// <param name="posX"></param>
+        /// <param name="posY"></param>
+        /// <param name="listaUtentes"></param>
+        /// <returns></returns>
+        public string AplicarDesfoque(string nomeFicheiro, string nomeDiretorio, int posX, int posY, List<UtenteVerificar> listaUtentes)
+        {
+            PythonEngine.Initialize();
+            using (Py.GIL())
+            {
+                dynamic sys = Py.Import("sys");
+                sys.path.append(@"C:\Users\marco\source\repos\Projeto_PDS\ProjetoPDS\FaceRecognition");
+
+                dynamic facilRecMod = Py.Import("recognition");
+                dynamic loadEncFunc = facilRecMod.censure_results_click;
+                string fotoDesfocadaPath = "";
+                foreach(UtenteVerificar u in listaUtentes)
+                {
+                    dynamic execFunc = loadEncFunc(nomeFicheiro, nomeDiretorio, posX, posY, u.Left, u.Top, u.Right, u.Bottom);
+                    fotoDesfocadaPath = execFunc.ToString();
+                }
+
+
+                return fotoDesfocadaPath;
+            }
             #endregion
             #endregion
+        }
     }
 }
