@@ -38,7 +38,7 @@ namespace ProjetoPDS.Classes
         static FotoComDesfoque()
         {
             Runtime.PythonDLL = "C:\\Users\\marco\\AppData\\Local\\Programs\\Python\\Python311\\python311.dll";
-            PythonEngine.PythonPath = PythonEngine.PythonPath;
+            PythonEngine.PythonPath = PythonEngine.PythonPath; 
         }
         /// <summary>
         /// Construtor por defeito.
