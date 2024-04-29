@@ -101,6 +101,16 @@ namespace ProjetoPDS.Controllers
             };
             return Ok(Json(fotoParaVerificar));
         }
+        /// <summary>
+        /// Na imagem caso seja clicado numa cara e escolhido a opção de censurar, irá verificar se está dentro dos limites identificados
+        /// e recorrer à censura.
+        /// </summary>
+        /// <param name="imagemOriginal"></param>
+        /// <param name="nomeFoto"></param>
+        /// <param name="posX"></param>
+        /// <param name="posY"></param>
+        /// <param name="utentesPorVerificar"></param>
+        /// <returns></returns>
         [HttpPost]
         [Route("RealizarDesfoque")] 
         public async Task<IActionResult> Desfoque([FromForm] string imagemOriginal, [FromForm] string nomeFoto, [FromForm] int posX, [FromForm] int posY, [FromForm] string utentesPorVerificar)
@@ -114,5 +124,19 @@ namespace ProjetoPDS.Controllers
             novoDesfoque.AplicarDesfoque(nomeFoto, imagemOriginal, posX, posY, listaDesfoque);
             return Ok();
         }
+        [HttpPost]
+        [Route("RealizarRegisto")]
+        public async Task<IActionResult> AdicionarUtente([FromForm] string imagemOriginal, [FromForm] string nomeFoto, [FromForm] string nome, [FromForm] string val, [FromForm] string sala, [FromForm] int aut, [FromForm] int posX, [FromForm] int posY, [FromForm] string utentesPorVerificar)
+        {
+            if (val == null || posX <= 0 || posY <= 0 || sala == null || aut == 0 || nome == null)
+                return BadRequest();
+
+            FotoComDesfoque novoRegisto = new FotoComDesfoque();
+            List<UtenteVerificar> listaRegisto = JsonConvert.DeserializeObject<List<UtenteVerificar>>(utentesPorVerificar);
+            novoRegisto.AdicionarUtente(nomeFoto, imagemOriginal, posX, posY, listaRegisto, val, sala, aut, nome);
+
+            return Ok();
+        }
+
     }
 }
