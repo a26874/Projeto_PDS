@@ -85,6 +85,13 @@ def censure_results(results, image, left, top, right, bottom):
         image[top:bottom, left:right] = face_image
     return image
 
+
+def add_utente_click (fileName, pathToFile, posX, posY, left, top, right, bottom):
+    image = cv2.imread(pathToFile)
+    if left <= posX <= right and top <= posY <= bottom:
+        return True
+    return False
+
 def censure_results_click(fileName, pathToFile, posX, posY, left, top, right, bottom):
     image = cv2.imread(pathToFile)
     if left <= posX <= right and top <= posY <= bottom:

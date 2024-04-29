@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <form id="realizarPublicacao" enctype="multipart/form-data" action="https://localhost:7248/Publicacao/realizarPublicacao" method="post">
+        <input id="idUtilizador"type="number" name="idUtilizador" placeholder="id de utilizador">
+        <br>
+        <br>
+        <!-- <label >Valencia:</label>
+        <select name="opcoes" id="valencia">
+            <option value="valenciaOpcao1">valencia1</option>
+            <option value="valenciaOpcao2">valencia2</option>
+        </select> -->
+        <br>
+        <br>
+        <!-- <label >Sala:</label>
+        <select name="sala" id="Sala">
+            <option value="salaOpcao1">sala1</option>
+            <option value="salaOpcao2">sala2</option>
+        </select> -->
+        <br>
+        <br>
+        <label for="">Tipo de publicacao:</label>
+        <select name="tipoPub" id="tipoPublicacao">
+            <option value="Mural">Mural</option>
+            <option value="Sala">Sala</option>
+            <option value="EncEd">EncEd</option>
+        </select>
+        <br><br>
+        <input type="file" name="caminhoFoto" accept="image/*">
+        <button type="submit">Upload Photo</button>
+        <br><br>
+        <button type="button" id="btnCriarPub">Criar publicacao</button>
+    </form>
+    
+
+    <!-- <form id="verifyPhoto" enctype="multipart/form-data" action="https://localhost:7248/Utente/verificarUtente" method="post">
+        <input type="file" name="Foto" accept="image/*">
+        <button type="submit">Verify Photo</button>
+     -->
+    
+</body>
+</html>

@@ -13,6 +13,9 @@ using System.Text.Json.Serialization;
 using Newtonsoft.Json;
 using Microsoft.AspNetCore.Http.HttpResults;
 using System.Text;
+using Microsoft.AspNetCore.Mvc;
+using System.Data;
+using System.Reflection.Metadata.Ecma335;
 
 namespace ProjetoPDS.Classes
 {
@@ -266,12 +269,57 @@ namespace ProjetoPDS.Classes
                     dynamic execFunc = loadEncFunc(nomeFicheiro, nomeDiretorio, posX, posY, u.Left, u.Top, u.Right, u.Bottom);
                     fotoDesfocadaPath = execFunc.ToString();
                 }
-
-
                 return fotoDesfocadaPath;
             }
             #endregion
             #endregion
+        }
+        /// <summary>
+        /// Verifica se o clique numa certa imagem está de acordo com o reconhecimento da cara.
+        /// Caso sim cria um novo utente com os dados e retorna esse mesmo utente para depois adicionar na base de dados.
+        /// </summary>
+        /// <param name="nomeFic"></param>
+        /// <param name="nomeDir"></param>
+        /// <param name="posX"></param>
+        /// <param name="posY"></param>
+        /// <param name="uAdd"></param>
+        /// <param name="val"></param>
+        /// <param name="sala"></param>
+        /// <param name="aut"></param>
+        /// <returns></returns>
+        public Utente AdicionarUtente(string nomeFic, string nomeDir, int posX, int posY, List<UtenteVerificar> listaUtentes, string val, string sala, int aut, string nome)
+        {
+            PythonEngine.Initialize();
+            using (Py.GIL())
+            {
+                dynamic sys = Py.Import("sys");
+                sys.path.append(@"C:\Users\marco\source\repos\Projeto_PDS\ProjetoPDS\FaceRecognition");
+
+                dynamic facilRecMod = Py.Import("recognition");
+                dynamic loadEncFunc = facilRecMod.add_utente_click;
+                bool existe = false;
+                foreach(UtenteVerificar u in listaUtentes)
+                {
+                    dynamic execFunc = loadEncFunc(nomeFic, nomeDir, posX, posY, u.Left, u.Top, u.Right, u.Bottom);
+                    string auxResult = execFunc.ToString();
+                    if (auxResult == "True")
+                    {
+                        existe = true;
+                        break;
+                    }
+                }
+                if(existe)
+                {
+                    Utente novoUtente = new Utente();
+                    novoUtente.Nome = nome;
+                    novoUtente.Sala = sala;
+                    novoUtente.Valencia = val;
+                    novoUtente.Autorizacao = aut;
+                    return novoUtente;
+
+                }
+                return null;
+            }
         }
     }
 }
