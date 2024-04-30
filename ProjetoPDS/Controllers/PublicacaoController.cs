@@ -59,6 +59,7 @@ namespace ProjetoPDS.Controllers
                     ut.Left = utente.Left;
                     ut.Top = utente.Top;
                     ut.Bottom = utente.Bottom;
+                    ut.Autorizacao = -1;
                     ut.Encoding = utente.Encoding;
                     utentesPorVerificar.Add(ut);
                 }
@@ -74,6 +75,7 @@ namespace ProjetoPDS.Controllers
                             {
                                 utente.Nome = infoUtente.Nome;
                                 utente.Id = infoUtente.idUtente;
+                                utente.Autorizacao = infoUtente.Autorizacao;   
                             }
                         }
                         else
@@ -84,6 +86,7 @@ namespace ProjetoPDS.Controllers
                             ut.Top = utente.Top;
                             ut.Bottom = utente.Bottom;
                             ut.Encoding = utente.Encoding;
+                            ut.Autorizacao = -1;
                             utentesPorVerificar.Add(ut);
                         }
                     }
@@ -91,7 +94,7 @@ namespace ProjetoPDS.Controllers
             }
             string nomeDiretorioAux = "";
             if (utentesPorVerificar.Count > 0)
-                nomeDiretorioAux = novoReconhecimento.MostrarNaoIdentificados(nomeFicheiro,nomeDiretorio, utentesPorVerificar);
+                nomeDiretorioAux = novoReconhecimento.MostrarNaoIdentificados(nomeFicheiro,nomeDiretorio, utentesPorVerificar,utentesIdentificados, pub.Local_Publicacaoid);
             var fotoParaVerificar = new
             {
                 nomeFoto = nomeFicheiro,

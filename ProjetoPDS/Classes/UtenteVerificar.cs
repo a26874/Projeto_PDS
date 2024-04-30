@@ -16,6 +16,7 @@ namespace ProjetoPDS.Classes
         private int cordBottom;
         private int cordRight;
         private int cordLeft;
+        private int autorizacao;
         private Encoding encoding;
         #endregion
 
@@ -60,6 +61,14 @@ namespace ProjetoPDS.Classes
         {
             get { return cordLeft; }
             set { cordLeft = value; }
+        }
+        /// <summary>
+        /// Obter autorizacao
+        /// </summary>
+        public int Autorizacao
+        {
+            get { return autorizacao; }
+            set { autorizacao = value; }
         }
         /// <summary>
         /// Retorna o encoding

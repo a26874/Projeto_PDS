@@ -13,9 +13,10 @@ namespace ProjetoPDS.Classes
 {
     public enum LocalPublicacao
     {
-        SALA,
-        GALERIA,
-        MURAL,
-        CHAT
+
+        GALERIA,//1
+        CHAT,//2
+        SALA,//3
+        MURAL//4
     }
 }

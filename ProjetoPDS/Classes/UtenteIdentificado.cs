@@ -21,6 +21,7 @@ namespace ProjetoPDS.Classes
         private int cordBottom;
         private int cordRight;
         private int cordLeft;
+        private int autorizacao;
         private Encoding encoding;
         #endregion
 
@@ -34,13 +35,14 @@ namespace ProjetoPDS.Classes
         {
 
         }
-        public UtenteIdentificado(int id, string nome, int cordTop, int cordBottom, int cordRight, int cordLeft, Encoding encoding, int top, int bottom, int right, int left)
+        public UtenteIdentificado(int id, string nome, int cordTop, int cordBottom, int cordRight, int cordLeft,int autorizacao, Encoding encoding, int top, int bottom, int right, int left)
         {
             this.nome = nome;
             this.cordTop = cordTop;
             this.cordBottom = cordBottom;
             this.cordRight = cordRight;
             this.cordLeft = cordLeft;
+            this.autorizacao = autorizacao;
             this.encoding = encoding;
         }
 
@@ -56,6 +58,16 @@ namespace ProjetoPDS.Classes
             get { return id; }
             set { id = value; }
         }
+
+        /// <summary>
+        /// Obter autorizacao
+        /// </summary>
+        public int Autorizacao
+        {
+            get { return autorizacao; }
+            set { autorizacao = value; }
+        }
+
         /// <summary>
         /// Obter o nome de um utente identificado.
         /// </summary>

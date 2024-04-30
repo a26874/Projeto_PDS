@@ -13,6 +13,7 @@ using System.Text.Json.Serialization;
 using Newtonsoft.Json;
 using Microsoft.AspNetCore.Http.HttpResults;
 using System.Text;
+using Microsoft.EntityFrameworkCore.Query.Internal;
 
 namespace ProjetoPDS.Classes
 {
@@ -212,7 +213,7 @@ namespace ProjetoPDS.Classes
         /// <param name="nomeDiretorio"></param>
         /// <param name="listaPorVerificar"></param>
         /// <returns></returns>
-        public string MostrarNaoIdentificados(string nomeFicheiro, string nomeDiretorio, List<UtenteVerificar> listaPorVerificar)
+        public string MostrarNaoIdentificados(string nomeFicheiro, string nomeDiretorio, List<UtenteVerificar> listaPorVerificar, List<UtenteIdentificado> listaIdentificados, LocalPublicacao local)
         {
             PythonEngine.Initialize();
             using (Py.GIL())
@@ -225,17 +226,38 @@ namespace ProjetoPDS.Classes
                 bool firstIteration = false;
                 string imagemVerificarPath = "";
                 string auxNomeFicheiro = Path.GetFileNameWithoutExtension(nomeFicheiro);
-                foreach (UtenteVerificar u in listaPorVerificar)
+                bool contains = false;
+                int auxLocal = local switch
                 {
-                    if (!firstIteration)
+                    LocalPublicacao.GALERIA => 1,
+                    LocalPublicacao.CHAT => 2,
+                    LocalPublicacao.SALA => 3,
+                    LocalPublicacao.MURAL => 4,
+                    _ => throw new ArgumentException("Invalid value for 'local'")
+                };
+                foreach (UtenteIdentificado u in listaIdentificados)
+                {
+                    foreach (UtenteVerificar uv in listaPorVerificar)
                     {
-                        dynamic execFunc = loadEncFunc(auxNomeFicheiro, nomeDiretorio, u.Left, u.Top, u.Right, u.Bottom);
-                        imagemVerificarPath = execFunc.ToString();
-                        firstIteration = true;
+                        if (u.Encoding == uv.Encoding)
+                        {
+                            contains = true; 
+                            break;
+                        }
                     }
-                    else
+                    if (contains || u.Autorizacao < auxLocal)
                     {
-                        dynamic execFunc = loadEncFunc(auxNomeFicheiro, imagemVerificarPath, u.Left, u.Top, u.Right, u.Bottom);
+                        if (!firstIteration)
+                        {
+                            dynamic execFunc = loadEncFunc(auxNomeFicheiro, nomeDiretorio, u.Left, u.Top, u.Right, u.Bottom);
+                            imagemVerificarPath = execFunc.ToString();
+                            firstIteration = true;
+                        }
+                        else
+                        {
+                            dynamic execFunc = loadEncFunc(auxNomeFicheiro, imagemVerificarPath, u.Left, u.Top, u.Right, u.Bottom);
+                        }
+                        contains = false;
                     }
                 }
                 return imagemVerificarPath;
