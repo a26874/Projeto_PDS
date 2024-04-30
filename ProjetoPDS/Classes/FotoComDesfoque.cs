@@ -316,7 +316,6 @@ namespace ProjetoPDS.Classes
                     novoUtente.Valencia = val;
                     novoUtente.Autorizacao = aut;
                     return novoUtente;
-
                 }
                 return null;
             }
