@@ -16,6 +16,9 @@ namespace ProjetoPDS.Classes
         private int cordBottom;
         private int cordRight;
         private int cordLeft;
+        private int primeiraCor;
+        private int segundaCor;
+        private int terceiraCor;
         private Encoding encoding;
         #endregion
 
@@ -68,6 +71,30 @@ namespace ProjetoPDS.Classes
         {
             get { return encoding; }
             set { encoding = value; }
+        }
+        /// <summary>
+        /// Retorna das 3 cores para identificação a primeira associada.
+        /// </summary>
+        public int PrimeiraCor
+        {
+            get { return primeiraCor; }
+            set { primeiraCor = value; }
+        }
+        /// <summary>
+        /// Retorna das 3 cores para identificação a segunda associada.
+        /// </summary>
+        public int SegundaCor
+        {
+            get { return segundaCor; }
+            set { segundaCor = value; }
+        }
+        /// <summary>
+        /// Retorna das 3 cores para identificação a terceira associada.
+        /// </summary>
+        public int TerceiraCor
+        {
+            get { return terceiraCor; }
+            set { terceiraCor = value; }
         }
         #endregion
 

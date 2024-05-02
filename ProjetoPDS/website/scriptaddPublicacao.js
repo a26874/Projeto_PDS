@@ -30,6 +30,8 @@ document.getElementById('addPublicacao').addEventListener('submit', async functi
         const absolutePath = data.value.diretorioFoto;
         const fotoOriginal = data.value.fotoOriginal;
         const utentesVerificar = data.value.listaNaoIdentificados;
+        //Caso existam.
+        // const utentesVerificados = 
         const nomeFotoFicheiro = data.value.nomeFoto;
         const relativePath = getRelativePath(absolutePath);
         const fotoParaVerificar = document.getElementById('fotoParaVerificar')
@@ -50,29 +52,124 @@ document.getElementById('addPublicacao').addEventListener('submit', async functi
                     enviarCoords(auxPosX, auxPosY, absolutePath, fotoOriginal, utentesVerificar,nomeFotoFicheiro);
                 });
 
+                //Criação de tabela com dados
+                const tabelaDados = document.createElement('table');
+                tabelaDados.style.border = "1px solid black";
+                bodyTag.appendChild(tabelaDados);
+                const headerTabelaDados = document.createElement('tr');
+                tabelaDados.append(headerTabelaDados);
+                //Criação de headers.
+                const headerDadosNome = document.createElement('th');
+                headerDadosNome.innerHTML = "Nome";
+                headerDadosNome.style.border = "1px solid black";
+                headerTabelaDados.append(headerDadosNome);
+
+                const headerDadosValencia = document.createElement('th');
+                headerDadosValencia.innerHTML = "Valencia";
+                headerDadosValencia.style.border = "1px solid black";
+                headerTabelaDados.append(headerDadosValencia);
+
+                const headerDadosSala = document.createElement('th');
+                headerDadosSala.innerHTML = "Sala";
+                headerDadosSala.style.border = "1px solid black";
+                headerTabelaDados.append(headerDadosSala);
+ 
+                const headerDadosAutorizacao = document.createElement('th');
+                headerDadosAutorizacao.innerHTML = "Autorizacao";
+                headerDadosAutorizacao.style.border = "1px solid black";
+                headerTabelaDados.append(headerDadosAutorizacao);
+
+                const headerDadosCor = document.createElement('th');
+                headerDadosCor.innerHTML = "Cor";
+                headerDadosCor.style.border = "1px solid black";
+                headerTabelaDados.append(headerDadosCor);
+
+                for(let i = 0 ; i < utentesVerificar.length; i++)
+                    {
+                        // Cria nova linha
+                        const linha = document.createElement('tr');
+                        linha.setAttribute('id', 'linhaNum' + (i + 1));
+                        tabelaDados.append(linha);
+
+                        // Cria célula para nome de utilizador
+                        const nomeTd = document.createElement('td');
+                        linha.append(nomeTd);
+                        const nomeUtilizadorInput = document.createElement('input');
+                        nomeUtilizadorInput.setAttribute('id', 'nomeUtente' + (i + 1));
+                        nomeUtilizadorInput.placeholder = "Nome utilizador " + (i + 1);
+                        nomeTd.append(nomeUtilizadorInput);
+
+                        // Cria célula para valência
+                        const valenciaTd = document.createElement('td');
+                        linha.append(valenciaTd);
+                        const valenciaUtilizadorInput = document.createElement('input');
+                        valenciaUtilizadorInput.setAttribute('id', 'valencia' + (i + 1));
+                        valenciaUtilizadorInput.placeholder = "Valencia";
+                        valenciaTd.append(valenciaUtilizadorInput);
+
+                        // Cria célula para sala
+                        const salaTd = document.createElement('td');
+                        linha.append(salaTd);
+                        const salaUtilizadorInput = document.createElement('input');
+                        salaUtilizadorInput.setAttribute('id', 'Sala' + (i + 1));
+                        salaUtilizadorInput.placeholder = "Sala";
+                        salaTd.append(salaUtilizadorInput);
+
+                        // Cria célula para autorização
+                        const autTd = document.createElement('td');
+                        linha.append(autTd);
+                        const autUtilizadorInput = document.createElement('input');
+                        autUtilizadorInput.setAttribute('id', 'aut' + (i + 1));
+                        autUtilizadorInput.placeholder = "Autorizacao";
+                        autTd.append(autUtilizadorInput);
+
+                        // Cria célula para cor do utilizador
+                        const corTd = document.createElement('td');
+                        linha.append(corTd);
+                        const corUtilizador = document.createElement('span');
+                        const primeiraCor = utentesVerificar[i].primeiraCor;
+                        const segundaCor = utentesVerificar[i].segundaCor;
+                        const terceiraCor = utentesVerificar[i].terceiraCor;
+                        corUtilizador.setAttribute('id', 'cor' + (i + 1));
+                        corUtilizador.style.backgroundColor = `rgb(${primeiraCor}, ${segundaCor}, ${terceiraCor})`;
+                        corUtilizador.innerHTML='.'
+                        corTd.append(corUtilizador);
+                    }
+
                 //Para adicionar o nome do utilizador, valencia, sala, aut, criar todas as caixas de text para o mesmo.
-                const nomeUtilizadorInput = document.createElement('input');
-                nomeUtilizadorInput.placeholder = "Nome utilizador";
-                bodyTag.appendChild(nomeUtilizadorInput);
 
-                nomeUtilizador = nomeUtilizadorInput.value;
-
-                const valenciaUtilizadorInput = document.createElement('input');
-                valenciaUtilizadorInput.placeholder = "Valencia";
-                bodyTag.appendChild(valenciaUtilizadorInput);
-                valenciaUtilizador = valenciaUtilizadorInput.value;
-
-                const salaUtilizadorInput = document.createElement('input');
-                salaUtilizadorInput.placeholder = "Sala";
-                bodyTag.appendChild(salaUtilizadorInput);
-                salaUtilizador = salaUtilizadorInput.value;
-
-                
                 const sendCoordButtonAdd = document.createElement('button');
                 sendCoordButtonAdd.textContent = 'Adicionar Pessoa';
                 sendCoordButtonAdd.addEventListener('click',function(){
-                    enviarDadosPessoa(auxPosX, auxPosY, nomeUtilizador, valenciaUtilizador, salaUtilizador,
-                    autUtilizador, fotoOriginal, nomeFotoFicheiro, utentesVerificar);
+                    for (let i = 0; i < utentesVerificar.length; i++)
+                    {
+                        const nomeUtilizadorId = document.getElementById('nomeUtente'+(i+1));
+                        const valenciaUtilizadorId = document.getElementById('valencia'+(i+1));
+                        const salaUtilizadorId = document.getElementById('Sala'+(i+1));
+                        const autUtilizadorId = document.getElementById('aut'+(i+1));
+                        const corUtilizadorId = document.getElementById('cor'+(i+1));
+                        const valorCor = window.getComputedStyle(corUtilizadorId);
+                        const valorCorAux = valorCor.backgroundColor;
+                        if (nomeUtilizadorId.value == "" && valenciaUtilizadorId.value == "" && salaUtilizadorId.value == "" 
+                                && autUtilizadorId.value == "")
+                                    continue;
+                        nomeUtilizador = nomeUtilizadorId.value;
+                        valenciaUtilizador = valenciaUtilizadorId.value;
+                        salaUtilizador = salaUtilizadorId.value;
+                        autUtilizador = autUtilizadorId.value;
+                        const rgbValues = valorCorAux.match(/\d+/g); 
+                        var primeiraCor = 0
+                        var segundaCor = 0
+                        var terceiraCor = 0
+                        if (rgbValues && rgbValues.length === 3) {
+                            primeiraCor = parseInt(rgbValues[0]);
+                            segundaCor = parseInt(rgbValues[1]);
+                            terceiraCor = parseInt(rgbValues[2]); 
+                        }
+                        enviarDadosPessoa(auxPosX, auxPosY, nomeUtilizador, valenciaUtilizador, salaUtilizador,
+                            autUtilizador, fotoOriginal, nomeFotoFicheiro, utentesVerificar, primeiraCor, segundaCor,
+                                terceiraCor);        
+                    }
                 });
                 bodyTag.appendChild(sendCoordButtonAdd);
                 bodyTag.appendChild(sendCoordButton);
@@ -87,8 +184,8 @@ document.getElementById('addPublicacao').addEventListener('submit', async functi
 
 function getRelativePath(absolutePath)
 {
-    const path = 'C:/Users/marco/source/repos/Projeto_PDS/ProjetoPDS/';
-    const relativePath = '../'+absolutePath.substring(path.length);
+    const projectPath = 'C:/Users/marco/source/repos/Projeto_PDS/ProjetoPDS/';
+    const relativePath = '../' + absolutePath.substring(projectPath.length);
     return relativePath;
 }
 
@@ -119,21 +216,25 @@ async function enviarCoords(posX, posY,absolutePath, nomeDiretorio, utentesVerif
     }
 }
 
-async function enviarDadosPessoa(posX, posY, nome, valencia, sala, aut, nomeDiretorio, nomeFotoFicheiro,utentesVerificar)
+async function enviarDadosPessoa(posX, posY, nome, valencia, sala, aut, nomeDiretorio, nomeFotoFicheiro,utentesVerificar, primeiraCor
+                                , segundaCor, terceiraCor)
 {
     alert("Estou a enviar dados para adicionar a bd.");
     try{
         const formDataPessoa = new FormData();
-        formDataPessoa.append('posX', posX);
-        formDataPessoa.append('posY', posY);
         formDataPessoa.append('imagemOriginal', nomeDiretorio);
         formDataPessoa.append('nomeFoto', nomeFotoFicheiro);
         formDataPessoa.append('nome', nome);
         formDataPessoa.append('val',valencia);
         formDataPessoa.append('sala',sala);
         formDataPessoa.append('aut', aut);
+        formDataPessoa.append('posX', posX);
+        formDataPessoa.append('posY', posY);
         formDataPessoa.append('utentesPorVerificar', JSON.stringify(utentesVerificar));
-
+        formDataPessoa.append('corP', primeiraCor)
+        formDataPessoa.append('corS', segundaCor)
+        formDataPessoa.append('corT', terceiraCor)
+        
         const apiURL = 'https://localhost:7248/Publicacao/RealizarRegisto';
         const requestOptionsPessoa = {
             method:'POST',

@@ -7,15 +7,9 @@
 *	<description></description>
 **/
 
+using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 using Python.Runtime;
 using System.ComponentModel.DataAnnotations;
-using System.Text.Json.Serialization;
-using Newtonsoft.Json;
-using Microsoft.AspNetCore.Http.HttpResults;
-using System.Text;
-using Microsoft.AspNetCore.Mvc;
-using System.Data;
-using System.Reflection.Metadata.Ecma335;
 
 namespace ProjetoPDS.Classes
 {
@@ -41,7 +35,8 @@ namespace ProjetoPDS.Classes
         static FotoComDesfoque()
         {
             Runtime.PythonDLL = "C:\\Users\\marco\\AppData\\Local\\Programs\\Python\\Python311\\python311.dll";
-            PythonEngine.PythonPath = PythonEngine.PythonPath; 
+            PythonEngine.PythonPath = PythonEngine.PythonPath;
+            PythonEngine.Initialize();
         }
         /// <summary>
         /// Construtor por defeito.
@@ -121,7 +116,6 @@ namespace ProjetoPDS.Classes
         /// <returns></returns>
         public List<UtenteIdentificado> IdentificarUtentes(string pathToFile)
         {
-            PythonEngine.Initialize();
             using (Py.GIL())
             {
                 dynamic sys = Py.Import("sys");
@@ -167,7 +161,6 @@ namespace ProjetoPDS.Classes
         /// <returns></returns>
         public byte[] addUtente(string pathToFile)
         {
-            PythonEngine.Initialize();
             using (Py.GIL())
             {
                 dynamic sys = Py.Import("sys");
@@ -191,7 +184,6 @@ namespace ProjetoPDS.Classes
         /// <returns></returns>
         public bool verificarEncoding(byte[] encoding1, byte[] encoding2)
         {
-            PythonEngine.Initialize();
             using (Py.GIL())
             {
                 dynamic sys = Py.Import("sys");
@@ -217,7 +209,7 @@ namespace ProjetoPDS.Classes
         /// <returns></returns>
         public string MostrarNaoIdentificados(string nomeFicheiro, string nomeDiretorio, List<UtenteVerificar> listaPorVerificar)
         {
-            PythonEngine.Initialize();
+            string imagemVerificarPath = "";
             using (Py.GIL())
             {
                 dynamic sys = Py.Import("sys");
@@ -226,23 +218,29 @@ namespace ProjetoPDS.Classes
                 dynamic facilRecMod = Py.Import("recognition");
                 dynamic loadEncFunc = facilRecMod.censure_results_2;
                 bool firstIteration = false;
-                string imagemVerificarPath = "";
                 string auxNomeFicheiro = Path.GetFileNameWithoutExtension(nomeFicheiro);
+                Random numerosRandom = new Random();
                 foreach (UtenteVerificar u in listaPorVerificar)
                 {
+                    int primeiraCor = numerosRandom.Next(256);
+                    int segundaCor = numerosRandom.Next(256);
+                    int terceiraCor = numerosRandom.Next(256);
+                    u.PrimeiraCor = primeiraCor;
+                    u.SegundaCor = segundaCor;
+                    u.TerceiraCor = terceiraCor;
                     if (!firstIteration)
                     {
-                        dynamic execFunc = loadEncFunc(auxNomeFicheiro, nomeDiretorio, u.Left, u.Top, u.Right, u.Bottom);
+                        dynamic execFunc = loadEncFunc(auxNomeFicheiro, nomeDiretorio, primeiraCor, segundaCor, terceiraCor, u.Left, u.Top, u.Right, u.Bottom);
                         imagemVerificarPath = execFunc.ToString();
                         firstIteration = true;
                     }
                     else
                     {
-                        dynamic execFunc = loadEncFunc(auxNomeFicheiro, imagemVerificarPath, u.Left, u.Top, u.Right, u.Bottom);
+                        dynamic execFunc = loadEncFunc(auxNomeFicheiro, imagemVerificarPath, primeiraCor, segundaCor, terceiraCor, u.Left, u.Top, u.Right, u.Bottom);
                     }
                 }
-                return imagemVerificarPath;
             }
+            return imagemVerificarPath;
         }
         /// <summary>
         /// Aplica desfoque baseado no click.
@@ -255,7 +253,6 @@ namespace ProjetoPDS.Classes
         /// <returns></returns>
         public string AplicarDesfoque(string nomeFicheiro, string nomeDiretorio, int posX, int posY, List<UtenteVerificar> listaUtentes)
         {
-            PythonEngine.Initialize();
             using (Py.GIL())
             {
                 dynamic sys = Py.Import("sys");
@@ -264,7 +261,7 @@ namespace ProjetoPDS.Classes
                 dynamic facilRecMod = Py.Import("recognition");
                 dynamic loadEncFunc = facilRecMod.censure_results_click;
                 string fotoDesfocadaPath = "";
-                foreach(UtenteVerificar u in listaUtentes)
+                foreach (UtenteVerificar u in listaUtentes)
                 {
                     dynamic execFunc = loadEncFunc(nomeFicheiro, nomeDiretorio, posX, posY, u.Left, u.Top, u.Right, u.Bottom);
                     fotoDesfocadaPath = execFunc.ToString();
@@ -282,43 +279,119 @@ namespace ProjetoPDS.Classes
         /// <param name="nomeDir"></param>
         /// <param name="posX"></param>
         /// <param name="posY"></param>
-        /// <param name="uAdd"></param>
+        /// <param name="listaUtentes"></param>
         /// <param name="val"></param>
         /// <param name="sala"></param>
         /// <param name="aut"></param>
+        /// <param name="nome"></param>
         /// <returns></returns>
-        public Utente AdicionarUtente(string nomeFic, string nomeDir, int posX, int posY, List<UtenteVerificar> listaUtentes, string val, string sala, int aut, string nome)
+        public Utente AdicionarUtenteClick(string nomeFic, string nomeDir, int posX, int posY, List<UtenteVerificar> listaUtentes, string val, string sala, int aut, string nome, int corP, int corS, int corT)
         {
-            PythonEngine.Initialize();
-            using (Py.GIL())
-            {
-                dynamic sys = Py.Import("sys");
-                sys.path.append(@"C:\Users\marco\source\repos\Projeto_PDS\ProjetoPDS\FaceRecognition");
+            //dynamic sys = Py.Import("sys");
+            //sys.path.append(@"C:\Users\marco\source\repos\Projeto_PDS\ProjetoPDS\FaceRecognition");
 
-                dynamic facilRecMod = Py.Import("recognition");
-                dynamic loadEncFunc = facilRecMod.add_utente_click;
-                bool existe = false;
-                foreach(UtenteVerificar u in listaUtentes)
+            dynamic facilRecMod = Py.Import("recognition");
+            dynamic loadEncFunc = facilRecMod.add_utente_click;
+            bool existe = false;
+            foreach (UtenteVerificar u in listaUtentes)
+            {
+                if (!(u.PrimeiraCor == corP && u.SegundaCor == corS && u.TerceiraCor == corT))
+                    continue;
+                dynamic execFunc = loadEncFunc(nomeFic, nomeDir, posX, posY, u.Left, u.Top, u.Right, u.Bottom);
+                string auxResult = execFunc.ToString();
+                if (auxResult == "True")
                 {
-                    dynamic execFunc = loadEncFunc(nomeFic, nomeDir, posX, posY, u.Left, u.Top, u.Right, u.Bottom);
-                    string auxResult = execFunc.ToString();
-                    if (auxResult == "True")
-                    {
-                        existe = true;
-                        break;
-                    }
+                    existe = true;
+                    break;
                 }
-                if(existe)
+            }
+            if (existe)
+            {
+                Utente novoUtente = new Utente();
+                novoUtente.Nome = nome;
+                novoUtente.Sala = sala;
+                novoUtente.Valencia = val;
+                novoUtente.Autorizacao = aut;
+                return novoUtente;
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Adiciona um utente a base de dados, conforme os dados introduzidos no website. Como não irá ter nome para a pessoa inicialmente
+        /// Verificamos a cor à qual ela está associada e criamos o novo utente.
+        /// </summary>
+        /// <param name="listaUtentes"></param>
+        /// <param name="val"></param>
+        /// <param name="sala"></param>
+        /// <param name="aut"></param>
+        /// <param name="nome"></param>
+        /// <param name="corP"></param>
+        /// <param name="corS"></param>
+        /// <param name="corT"></param>
+        /// <returns></returns>
+        public List<Utente> AdicionarUtenteBaseDados(List<UtenteVerificar> listaUtentes, string val, string sala, int aut, string nome, int corP, int corS, int corT, out List<Encoding> auxListaEncodings, dataBase baseDados)
+        {
+            List<Utente> auxListaUtentes = new List<Utente>();
+            auxListaEncodings = new List<Encoding> ();
+            bool existe = false;
+
+            var ultimoIdInserido = baseDados.Utente
+                .OrderByDescending(u => u.idUtente)
+                .Select(u => u.idUtente)
+                .FirstOrDefault();
+            int ultimoIdInseridoAux = (int)ultimoIdInserido;
+            foreach (UtenteVerificar u in listaUtentes)
+            {
+                if (!(u.PrimeiraCor == corP && u.SegundaCor == corS && u.TerceiraCor == corT))
+                    continue;
+                existe = true;
+                if (existe)
                 {
+                    Encoding novoEncoding = new Encoding();
                     Utente novoUtente = new Utente();
                     novoUtente.Nome = nome;
                     novoUtente.Sala = sala;
                     novoUtente.Valencia = val;
                     novoUtente.Autorizacao = aut;
-                    return novoUtente;
+                    novoEncoding = u.Encoding;
+                    novoEncoding.UTENTEidUtente = ultimoIdInseridoAux;
+                    ultimoIdInseridoAux++;
+                    auxListaUtentes.Add(novoUtente);
+                    auxListaEncodings.Add(novoEncoding);
+                    return auxListaUtentes;
                 }
-                return null;
             }
+            auxListaEncodings = null;
+            return null;
+        }
+        
+        /// <summary>
+        /// Função para alterar dados de um utilizador na base de dados.
+        /// </summary>
+        /// <param name="listaUtentes"></param>
+        /// <param name="val"></param>
+        /// <param name="sala"></param>
+        /// <param name="aut"></param>
+        /// <param name="nome"></param>
+        /// <param name="corP"></param>
+        /// <param name="corS"></param>
+        /// <param name="corT"></param>
+        /// <returns></returns>
+        public Utente EditarUtenteBaseDados(List<UtenteVerificar> listaUtentes, string val, string sala, int aut, string nome, int corP, int corS, int corT)
+        {
+
+            bool editado = false;
+
+            if(editado)
+            {
+
+            }
+            return null;
+        }
+        ~FotoComDesfoque()
+        {
+            PythonEngine.Shutdown();
         }
     }
 }
