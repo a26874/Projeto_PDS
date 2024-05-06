@@ -30,8 +30,7 @@ document.getElementById('addPublicacao').addEventListener('submit', async functi
         const absolutePath = data.value.diretorioFoto;
         const fotoOriginal = data.value.fotoOriginal;
         const utentesVerificar = data.value.listaNaoIdentificados;
-        //Caso existam.
-        // const utentesVerificados = 
+        const utentesVerificados = data.value.listaIdentificados;
         const nomeFotoFicheiro = data.value.nomeFoto;
         const relativePath = getRelativePath(absolutePath);
         const fotoParaVerificar = document.getElementById('fotoParaVerificar')
@@ -84,7 +83,7 @@ document.getElementById('addPublicacao').addEventListener('submit', async functi
                 headerDadosCor.style.border = "1px solid black";
                 headerTabelaDados.append(headerDadosCor);
 
-                for(let i = 0 ; i < utentesVerificar.length; i++)
+                for(let i = 0 ; i < utentesVerificar.length + utentesVerificados.length; i++)
                     {
                         // Cria nova linha
                         const linha = document.createElement('tr');
@@ -97,6 +96,8 @@ document.getElementById('addPublicacao').addEventListener('submit', async functi
                         const nomeUtilizadorInput = document.createElement('input');
                         nomeUtilizadorInput.setAttribute('id', 'nomeUtente' + (i + 1));
                         nomeUtilizadorInput.placeholder = "Nome utilizador " + (i + 1);
+                        if(utentesVerificados[i].nome != null && i < utentesVerificados.length)
+                            nomeUtilizadorInput.value = utentesVerificados[i].nome
                         nomeTd.append(nomeUtilizadorInput);
 
                         // Cria célula para valência
@@ -105,6 +106,8 @@ document.getElementById('addPublicacao').addEventListener('submit', async functi
                         const valenciaUtilizadorInput = document.createElement('input');
                         valenciaUtilizadorInput.setAttribute('id', 'valencia' + (i + 1));
                         valenciaUtilizadorInput.placeholder = "Valencia";
+                        if(utentesVerificados[i].valencia != null && i < utentesVerificados.length)
+                            valenciaUtilizadorInput.value = utentesVerificados[i].valencia
                         valenciaTd.append(valenciaUtilizadorInput);
 
                         // Cria célula para sala
@@ -113,6 +116,8 @@ document.getElementById('addPublicacao').addEventListener('submit', async functi
                         const salaUtilizadorInput = document.createElement('input');
                         salaUtilizadorInput.setAttribute('id', 'Sala' + (i + 1));
                         salaUtilizadorInput.placeholder = "Sala";
+                        if(utentesVerificados[i].sala != null && i < utentesVerificados.length)
+                            salaUtilizadorInput.value = utentesVerificados[i].sala
                         salaTd.append(salaUtilizadorInput);
 
                         // Cria célula para autorização
@@ -121,15 +126,29 @@ document.getElementById('addPublicacao').addEventListener('submit', async functi
                         const autUtilizadorInput = document.createElement('input');
                         autUtilizadorInput.setAttribute('id', 'aut' + (i + 1));
                         autUtilizadorInput.placeholder = "Autorizacao";
+                        if(utentesVerificados[i].autorizacao!=null && i < utentesVerificados.length)
+                            autUtilizadorInput.value = utentesVerificados[i].autorizacao
                         autTd.append(autUtilizadorInput);
 
                         // Cria célula para cor do utilizador
                         const corTd = document.createElement('td');
                         linha.append(corTd);
                         const corUtilizador = document.createElement('span');
-                        const primeiraCor = utentesVerificar[i].primeiraCor;
-                        const segundaCor = utentesVerificar[i].segundaCor;
-                        const terceiraCor = utentesVerificar[i].terceiraCor;
+                        var primeiraCor = 0
+                        var segundaCor = 0
+                        var terceiraCor = 0
+                        if(utentesVerificados[i].PrimeiraCor && utentesVerificados[i].SegundaCor && utentesVerificados[i].TerceiraCor)
+                        {
+                            primeiraCor = utentesVerificados[i].PrimeiraCor;   
+                            segundaCor = utentesVerificados[i].PrimeiraCor;   
+                            terceiraCor = utentesVerificados[i].PrimeiraCor;   
+                        }
+                        else
+                        {
+                            primeiraCor = utentesVerificar[i].primeiraCor;
+                            segundaCor = utentesVerificar[i].segundaCor;
+                            terceiraCor = utentesVerificar[i].terceiraCor;
+                        }
                         corUtilizador.setAttribute('id', 'cor' + (i + 1));
                         corUtilizador.style.backgroundColor = `rgb(${primeiraCor}, ${segundaCor}, ${terceiraCor})`;
                         corUtilizador.innerHTML='.'
@@ -140,7 +159,7 @@ document.getElementById('addPublicacao').addEventListener('submit', async functi
 
                 const sendCoordButtonAdd = document.createElement('button');
                 sendCoordButtonAdd.textContent = 'Adicionar Pessoa';
-                sendCoordButtonAdd.addEventListener('click',function(){
+                sendCoordButtonAdd.addEventListener('click',async function(){
                     for (let i = 0; i < utentesVerificar.length; i++)
                     {
                         const nomeUtilizadorId = document.getElementById('nomeUtente'+(i+1));
@@ -166,7 +185,7 @@ document.getElementById('addPublicacao').addEventListener('submit', async functi
                             segundaCor = parseInt(rgbValues[1]);
                             terceiraCor = parseInt(rgbValues[2]); 
                         }
-                        enviarDadosPessoa(auxPosX, auxPosY, nomeUtilizador, valenciaUtilizador, salaUtilizador,
+                        await enviarDadosPessoa(auxPosX, auxPosY, nomeUtilizador, valenciaUtilizador, salaUtilizador,
                             autUtilizador, fotoOriginal, nomeFotoFicheiro, utentesVerificar, primeiraCor, segundaCor,
                                 terceiraCor);        
                     }
@@ -178,13 +197,13 @@ document.getElementById('addPublicacao').addEventListener('submit', async functi
         })
     } catch (error) {
         console.error(error);
-        alert('An error occurred while uploading the photo.');
+        alert('An error occurred while uploading the photo. ' + error);
     }
 });
 
 function getRelativePath(absolutePath)
 {
-    const projectPath = 'C:/Users/marco/source/repos/Projeto_PDS/ProjetoPDS/';
+    const projectPath = 'C:/Users/marco/source/repos/Projeto_PDS/ProjetoPDS/website/';
     const relativePath = '../' + absolutePath.substring(projectPath.length);
     return relativePath;
 }

@@ -7,9 +7,10 @@
 *	<description></description>
 **/
 
-using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
+using Newtonsoft.Json;
 using Python.Runtime;
 using System.ComponentModel.DataAnnotations;
+using System.Runtime.Serialization;
 
 namespace ProjetoPDS.Classes
 {
@@ -37,6 +38,8 @@ namespace ProjetoPDS.Classes
             Runtime.PythonDLL = "C:\\Users\\marco\\AppData\\Local\\Programs\\Python\\Python311\\python311.dll";
             PythonEngine.PythonPath = PythonEngine.PythonPath;
             PythonEngine.Initialize();
+            dynamic sys = Py.Import("sys");
+            sys.path.append(@"C:\Users\marco\source\repos\Projeto_PDS\ProjetoPDS\FaceRecognition");
         }
         /// <summary>
         /// Construtor por defeito.
@@ -116,43 +119,40 @@ namespace ProjetoPDS.Classes
         /// <returns></returns>
         public List<UtenteIdentificado> IdentificarUtentes(string pathToFile)
         {
-            using (Py.GIL())
+            dynamic sys = Py.Import("sys");
+
+            sys.path.append(@"C:\Users\marco\source\repos\Projeto_PDS\ProjetoPDS\FaceRecognition");
+
+            dynamic facilRecMod = Py.Import("recognition");
+            dynamic loadEncFunc = facilRecMod.recognition;
+
+            dynamic auxEncoding = loadEncFunc(pathToFile);
+
+
+            Dictionary<string, byte[]> encodingDict = new Dictionary<string, byte[]>();
+
+            foreach (PyObject key in auxEncoding)
             {
-                dynamic sys = Py.Import("sys");
-
-                sys.path.append(@"C:\Users\marco\source\repos\Projeto_PDS\ProjetoPDS\FaceRecognition");
-
-                dynamic facilRecMod = Py.Import("recognition");
-                dynamic loadEncFunc = facilRecMod.recognition;
-
-                dynamic auxEncoding = loadEncFunc(pathToFile);
-
-
-                Dictionary<string, byte[]> encodingDict = new Dictionary<string, byte[]>();
-
-                foreach (PyObject key in auxEncoding)
-                {
-                    string faceLocation = key.ToString();
-                    string base64encoding = auxEncoding[key].ToString();
-                    byte[] encoding = Convert.FromBase64String(base64encoding);
-                    encodingDict.Add(faceLocation, encoding);
-                }
-
-                List<UtenteIdentificado> utentesIdentificados = new List<UtenteIdentificado>();
-                foreach (var key in encodingDict)
-                {
-                    string[] parts = key.Key.Trim('(', ')').Split(',');
-                    UtenteIdentificado novoUtente = new UtenteIdentificado();
-                    novoUtente.Top = int.Parse(parts[0].Trim());
-                    novoUtente.Right = int.Parse(parts[1].Trim());
-                    novoUtente.Bottom = int.Parse(parts[2].Trim());
-                    novoUtente.Left = int.Parse(parts[3].Trim());
-                    novoUtente.Encoding = new Encoding();
-                    novoUtente.Encoding.encoding = key.Value;
-                    utentesIdentificados.Add(novoUtente);
-                }
-                return utentesIdentificados;
+                string faceLocation = key.ToString();
+                string base64encoding = auxEncoding[key].ToString();
+                byte[] encoding = Convert.FromBase64String(base64encoding);
+                encodingDict.Add(faceLocation, encoding);
             }
+
+            List<UtenteIdentificado> utentesIdentificados = new List<UtenteIdentificado>();
+            foreach (var key in encodingDict)
+            {
+                string[] parts = key.Key.Trim('(', ')').Split(',');
+                UtenteIdentificado novoUtente = new UtenteIdentificado();
+                novoUtente.Top = int.Parse(parts[0].Trim());
+                novoUtente.Right = int.Parse(parts[1].Trim());
+                novoUtente.Bottom = int.Parse(parts[2].Trim());
+                novoUtente.Left = int.Parse(parts[3].Trim());
+                novoUtente.Encoding = new Encoding();
+                novoUtente.Encoding.encoding = key.Value;
+                utentesIdentificados.Add(novoUtente);
+            }
+            return utentesIdentificados;
         }
         /// <summary>
         /// Retorna um encoding sozinho.
@@ -189,10 +189,12 @@ namespace ProjetoPDS.Classes
                 dynamic sys = Py.Import("sys");
                 sys.path.append(@"C:\Users\marco\source\repos\Projeto_PDS\ProjetoPDS\FaceRecognition");
 
+                var auxEncoding1 = JsonConvert.SerializeObject(encoding1);
+                var auxEncoding2 = JsonConvert.SerializeObject(encoding2);
                 dynamic facilRecMod = Py.Import("recognition");
                 dynamic loadEncFunc = facilRecMod.compareEncoding;
 
-                dynamic auxCompare = loadEncFunc(encoding1, encoding2);
+                dynamic auxCompare = loadEncFunc(auxEncoding1, auxEncoding2);
 
                 bool exists = false;
                 string auxExist = auxCompare;
@@ -330,17 +332,11 @@ namespace ProjetoPDS.Classes
         /// <param name="corS"></param>
         /// <param name="corT"></param>
         /// <returns></returns>
-        public List<Utente> AdicionarUtenteBaseDados(List<UtenteVerificar> listaUtentes, string val, string sala, int aut, string nome, int corP, int corS, int corT, out List<Encoding> auxListaEncodings, dataBase baseDados)
+        public Dictionary<Utente, Encoding> AdicionarUtenteBaseDados(List<UtenteVerificar> listaUtentes, string val, string sala, int aut, string nome, int corP, int corS, int corT)
         {
-            List<Utente> auxListaUtentes = new List<Utente>();
-            auxListaEncodings = new List<Encoding> ();
+            Dictionary<Utente, Encoding> novoListaUtentes = new Dictionary<Utente, Encoding>();
             bool existe = false;
 
-            var ultimoIdInserido = baseDados.Utente
-                .OrderByDescending(u => u.idUtente)
-                .Select(u => u.idUtente)
-                .FirstOrDefault();
-            int ultimoIdInseridoAux = (int)ultimoIdInserido;
             foreach (UtenteVerificar u in listaUtentes)
             {
                 if (!(u.PrimeiraCor == corP && u.SegundaCor == corS && u.TerceiraCor == corT))
@@ -355,17 +351,12 @@ namespace ProjetoPDS.Classes
                     novoUtente.Valencia = val;
                     novoUtente.Autorizacao = aut;
                     novoEncoding = u.Encoding;
-                    novoEncoding.UTENTEidUtente = ultimoIdInseridoAux;
-                    ultimoIdInseridoAux++;
-                    auxListaUtentes.Add(novoUtente);
-                    auxListaEncodings.Add(novoEncoding);
-                    return auxListaUtentes;
+                    novoListaUtentes.Add(novoUtente, novoEncoding);
                 }
             }
-            auxListaEncodings = null;
-            return null;
+            return novoListaUtentes;
         }
-        
+
         /// <summary>
         /// Função para alterar dados de um utilizador na base de dados.
         /// </summary>
@@ -383,7 +374,7 @@ namespace ProjetoPDS.Classes
 
             bool editado = false;
 
-            if(editado)
+            if (editado)
             {
 
             }

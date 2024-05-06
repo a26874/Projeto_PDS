@@ -39,14 +39,17 @@ def singleRecognition(pathToFile):
         
 def compareEncoding(encoding1, encoding2):
     try:
-        face_encoding_1 = pickle.loads(encoding1)
-        face_encoding_2 = pickle.loads(encoding2)
-        
+        decoded_encoding1 = base64.b64decode(encoding1)
+        decoded_encoding2 = base64.b64decode(encoding2)
+
+        face_encoding_1 = pickle.loads(decoded_encoding1)
+        face_encoding_2 = pickle.loads(decoded_encoding2)
+
         if not isinstance(face_encoding_1, list):
             face_encoding_1 = [face_encoding_1]
         if not isinstance(face_encoding_2, list):
             face_encoding_2 = [face_encoding_2]
-        results = face_recognition.compare_faces(face_encoding_1, face_encoding_2)
+        results = face_recognition.compare_faces(face_encoding_1, face_encoding_2[0])
         return str(np.any(results))
     except IndexError:
         print('asd')
