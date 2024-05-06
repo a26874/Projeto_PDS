@@ -200,6 +200,34 @@ namespace ProjetoPDS.Controllers
             }
             return Ok();
         }
+        /// <summary>
+        /// Edita um utente.
+        /// </summary>
+        /// <param name="imagemOriginal"></param>
+        /// <param name="nomeFoto"></param>
+        /// <param name="nome"></param>
+        /// <param name="val"></param>
+        /// <param name="sala"></param>
+        /// <param name="aut"></param>
+        /// <param name="posX"></param>
+        /// <param name="posY"></param>
+        /// <param name="utentesVerificados"></param>
+        /// <param name="corP"></param>
+        /// <param name="corS"></param>
+        /// <param name="corT"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("RealizarRegisto")]
+
+        public async Task<IActionResult> EditarUtente([FromForm] string imagemOriginal, [FromForm] string nomeFoto, [FromForm] string nome, [FromForm] string val, [FromForm] string sala, [FromForm] int aut, [FromForm] int posX, [FromForm] int posY, [FromForm] string utentesVerificados
+                                                       , [FromForm] int corP, [FromForm] int corS, [FromForm] int corT)
+        {
+            if (val == null || posX <= 0 || posY <= 0 || sala == null || aut == 0 || nome == null || utentesVerificados == null)
+                return BadRequest();
+            
+
+            return Ok();
+        }
 
     }
 }
