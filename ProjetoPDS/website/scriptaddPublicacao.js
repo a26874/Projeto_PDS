@@ -30,8 +30,7 @@ document.getElementById('addPublicacao').addEventListener('submit', async functi
         const absolutePath = data.value.diretorioFoto;
         const fotoOriginal = data.value.fotoOriginal;
         const utentesVerificar = data.value.listaNaoIdentificados;
-        //Caso existam.
-        // const utentesVerificados = 
+        const utentesVerificados = data.value.listaIdentificados;
         const nomeFotoFicheiro = data.value.nomeFoto;
         const relativePath = getRelativePath(absolutePath);
         const fotoParaVerificar = document.getElementById('fotoParaVerificar')
@@ -44,58 +43,208 @@ document.getElementById('addPublicacao').addEventListener('submit', async functi
             let auxPosY = parseInt(posY);
             document.getElementById('posX').innerHTML= "Posicao X:" + auxPosX;
             document.getElementById('posY').innerHTML= "Posicao Y:" + auxPosY;
+
             if (!buttonCreated) {
                 //Criar também para adicionar baseado no click
-                const sendCoordButton = document.createElement('button');
-                sendCoordButton.textContent = 'Desfocar';
-                sendCoordButton.addEventListener('click', function() {
-                    enviarCoords(auxPosX, auxPosY, absolutePath, fotoOriginal, utentesVerificar,nomeFotoFicheiro);
-                });
+                // const sendCoordButton = document.createElement('button');
+                // sendCoordButton.textContent = 'Desfocar';
+                // sendCoordButton.addEventListener('click', function() {
+                //     enviarCoords(auxPosX, auxPosY, absolutePath, fotoOriginal, utentesVerificar,nomeFotoFicheiro);
+                // });
 
-                //Criação de tabela com dados
-                const tabelaDados = document.createElement('table');
-                tabelaDados.style.border = "1px solid black";
-                bodyTag.appendChild(tabelaDados);
-                const headerTabelaDados = document.createElement('tr');
-                tabelaDados.append(headerTabelaDados);
+                const headerTabelaReconhecidos = document.createElement('h1')
+                headerTabelaReconhecidos.innerHTML = "Pessoas Reconhecidas: " + utentesVerificados.length
+                bodyTag.appendChild(headerTabelaReconhecidos)
+                //Criação de tabela com dados de utentes verificados.
+                const tabelaDadosIdentificados = document.createElement('table');
+                tabelaDadosIdentificados.style.border = "1px solid black";
+                bodyTag.appendChild(tabelaDadosIdentificados);
+                const headerTabelaDadosIdentificados = document.createElement('tr');
+                tabelaDadosIdentificados.append(headerTabelaDadosIdentificados);
                 //Criação de headers.
-                const headerDadosNome = document.createElement('th');
-                headerDadosNome.innerHTML = "Nome";
-                headerDadosNome.style.border = "1px solid black";
-                headerTabelaDados.append(headerDadosNome);
+                const headerDadosNomeIdentificados = document.createElement('th');
+                headerDadosNomeIdentificados.innerHTML = "Nome";
+                headerDadosNomeIdentificados.style.border = "1px solid black";
+                headerTabelaDadosIdentificados.append(headerDadosNomeIdentificados);
 
-                const headerDadosValencia = document.createElement('th');
-                headerDadosValencia.innerHTML = "Valencia";
-                headerDadosValencia.style.border = "1px solid black";
-                headerTabelaDados.append(headerDadosValencia);
+                const headerDadosValenciaIdentificados = document.createElement('th');
+                headerDadosValenciaIdentificados.innerHTML = "Valencia";
+                headerDadosValenciaIdentificados.style.border = "1px solid black";
+                headerTabelaDadosIdentificados.append(headerDadosValenciaIdentificados);
 
-                const headerDadosSala = document.createElement('th');
-                headerDadosSala.innerHTML = "Sala";
-                headerDadosSala.style.border = "1px solid black";
-                headerTabelaDados.append(headerDadosSala);
+                const headerDadosSalaIdentificados = document.createElement('th');
+                headerDadosSalaIdentificados.innerHTML = "Sala";
+                headerDadosSalaIdentificados.style.border = "1px solid black";
+                headerTabelaDadosIdentificados.append(headerDadosSalaIdentificados);
  
-                const headerDadosAutorizacao = document.createElement('th');
-                headerDadosAutorizacao.innerHTML = "Autorizacao";
-                headerDadosAutorizacao.style.border = "1px solid black";
-                headerTabelaDados.append(headerDadosAutorizacao);
+                const headerDadosAutorizacaoIdentificados = document.createElement('th');
+                headerDadosAutorizacaoIdentificados.innerHTML = "Autorizacao";
+                headerDadosAutorizacaoIdentificados.style.border = "1px solid black";
+                headerTabelaDadosIdentificados.append(headerDadosAutorizacaoIdentificados);
 
-                const headerDadosCor = document.createElement('th');
-                headerDadosCor.innerHTML = "Cor";
-                headerDadosCor.style.border = "1px solid black";
-                headerTabelaDados.append(headerDadosCor);
+                const headerDadosCorIdentificados = document.createElement('th');
+                headerDadosCorIdentificados.innerHTML = "Cor";
+                headerDadosCorIdentificados.style.border = "1px solid black";
+                headerTabelaDadosIdentificados.append(headerDadosCorIdentificados);
 
-                for(let i = 0 ; i < utentesVerificar.length; i++)
+
+                // Auxiliares para verificar se algum dos dados foram modificados.
+                const auxNomeUtilizadorInput = []
+                const auxValenciaUtilizadorInput = []
+                const auxSalaUtilizadorInput = []
+                const auxAutorizacaoInput = []
+                for(let i = 0 ; i < utentesVerificados.length; i++)
                     {
                         // Cria nova linha
                         const linha = document.createElement('tr');
                         linha.setAttribute('id', 'linhaNum' + (i + 1));
-                        tabelaDados.append(linha);
+                        tabelaDadosIdentificados.append(linha);
 
                         // Cria célula para nome de utilizador
                         const nomeTd = document.createElement('td');
                         linha.append(nomeTd);
                         const nomeUtilizadorInput = document.createElement('input');
-                        nomeUtilizadorInput.setAttribute('id', 'nomeUtente' + (i + 1));
+                        nomeUtilizadorInput.setAttribute('id', 'nomeUtenteIdentificado' + (i + 1));
+                        nomeUtilizadorInput.placeholder = "Nome utilizador " + (i + 1);
+                        if(utentesVerificados[i].nome != null && i < utentesVerificados.length)
+                            nomeUtilizadorInput.value = utentesVerificados[i].nome
+                        nomeTd.append(nomeUtilizadorInput);
+
+                        // Cria célula para valência
+                        const valenciaTd = document.createElement('td');
+                        linha.append(valenciaTd);
+                        const valenciaUtilizadorInput = document.createElement('input');
+                        valenciaUtilizadorInput.setAttribute('id', 'valenciaIdentificado' + (i + 1));
+                        valenciaUtilizadorInput.placeholder = "Valencia";
+                        if(utentesVerificados[i].valencia != null && i < utentesVerificados.length)
+                            valenciaUtilizadorInput.value = utentesVerificados[i].valencia
+                        valenciaTd.append(valenciaUtilizadorInput);
+
+                        // Cria célula para sala
+                        const salaTd = document.createElement('td');
+                        linha.append(salaTd);
+                        const salaUtilizadorInput = document.createElement('input');
+                        salaUtilizadorInput.setAttribute('id', 'SalaIdentificado' + (i + 1));
+                        salaUtilizadorInput.placeholder = "Sala";
+                        if(utentesVerificados[i].sala != null && i < utentesVerificados.length)
+                            salaUtilizadorInput.value = utentesVerificados[i].sala
+                        salaTd.append(salaUtilizadorInput);
+
+                        // Cria célula para autorização
+                        const autTd = document.createElement('td');
+                        linha.append(autTd);
+                        const autUtilizadorInput = document.createElement('input');
+                        autUtilizadorInput.setAttribute('id', 'autIdentificado' + (i + 1));
+                        autUtilizadorInput.placeholder = "Autorizacao";
+                        if(utentesVerificados[i].autorizacao!=null && i < utentesVerificados.length)
+                            autUtilizadorInput.value = utentesVerificados[i].autorizacao
+                        autTd.append(autUtilizadorInput);
+
+                        // Cria célula para cor do utilizador
+                        const corTd = document.createElement('td');
+                        linha.append(corTd);
+                        const corUtilizador = document.createElement('span');
+                        var primeiraCor = 0
+                        var segundaCor = 0
+                        var terceiraCor = 0
+                        primeiraCor = utentesVerificados[i].primeiraCor;   
+                        segundaCor = utentesVerificados[i].segundaCor;   
+                        terceiraCor = utentesVerificados[i].terceiraCor;   
+                        corUtilizador.setAttribute('id', 'corIdentificado' + (i + 1));
+                        corUtilizador.style.backgroundColor = `rgb(${primeiraCor}, ${segundaCor}, ${terceiraCor})`;
+                        corUtilizador.innerHTML='.'
+                        corTd.append(corUtilizador);
+                        auxNomeUtilizadorInput.push(nomeUtilizadorInput.value);
+                        auxValenciaUtilizadorInput.push(valenciaUtilizadorInput.value);
+                        auxSalaUtilizadorInput.push(salaUtilizadorInput.value);
+                        auxAutorizacaoInput.push(autUtilizadorInput.value);
+                    }
+                    const sendDataToEdit = document.createElement('button');
+                    sendDataToEdit.textContent = 'Editar Pessoa(s)';
+                    sendDataToEdit.addEventListener('click',async function(){
+                        for (let i = 0; i < utentesVerificados.length; i++)
+                        {
+                            const nomeUtilizadorId = document.getElementById('nomeUtenteIdentificado'+(i+1));
+                            const valenciaUtilizadorId = document.getElementById('valenciaIdentificado'+(i+1));
+                            const salaUtilizadorId = document.getElementById('SalaIdentificado'+(i+1));
+                            const autUtilizadorId = document.getElementById('autIdentificado'+(i+1));
+                            const corUtilizadorId = document.getElementById('corIdentificado'+(i+1));
+                            const idUtilizadorBd = utentesVerificados[i].id;
+                            const valorCor = window.getComputedStyle(corUtilizadorId);
+                            const valorCorAux = valorCor.backgroundColor;
+                            if(auxNomeUtilizadorInput[i] == nomeUtilizadorId.value && 
+                               auxValenciaUtilizadorInput[i] == valenciaUtilizadorId.value &&
+                               auxSalaUtilizadorInput[i] == salaUtilizadorId.value &&
+                               auxAutorizacaoInput[i] == autUtilizadorId.value )
+                               continue;
+                            nomeUtilizador = nomeUtilizadorId.value;
+                            valenciaUtilizador = valenciaUtilizadorId.value;
+                            salaUtilizador = salaUtilizadorId.value;
+                            autUtilizador = autUtilizadorId.value;
+                            const rgbValues = valorCorAux.match(/\d+/g); 
+                            var primeiraCor = 0
+                            var segundaCor = 0
+                            var terceiraCor = 0
+                            if (rgbValues && rgbValues.length === 3) {
+                                primeiraCor = parseInt(rgbValues[0]);
+                                segundaCor = parseInt(rgbValues[1]);
+                                terceiraCor = parseInt(rgbValues[2]); 
+                            }
+                            await editarDadosPessoa(idUtilizadorBd,nomeUtilizador, valenciaUtilizador, salaUtilizador,
+                                autUtilizador, utentesVerificados, primeiraCor, segundaCor,
+                                    terceiraCor);        
+                        }
+                    })
+                bodyTag.appendChild(sendDataToEdit)
+                const headerTabelaNaoReconhecidos = document.createElement('h1')
+                headerTabelaNaoReconhecidos.innerHTML = "Pessoas Nao Reconhecidas: " + utentesVerificar.length
+                bodyTag.appendChild(headerTabelaNaoReconhecidos)
+                    
+                //Criação de tabela para os utentes não verificados.
+                const tabelaDadosNaoIdentificados = document.createElement('table');
+                tabelaDadosNaoIdentificados.style.border = "1px solid black";
+                bodyTag.appendChild(tabelaDadosNaoIdentificados);
+                const headerTabelaDadosNaoIdentificados = document.createElement('tr');
+                tabelaDadosNaoIdentificados.append(headerTabelaDadosNaoIdentificados);
+                //Criação de headers.
+                const headerDadosNomeNaoIdentificados = document.createElement('th');
+                headerDadosNomeNaoIdentificados.innerHTML = "Nome";
+                headerDadosNomeNaoIdentificados.style.border = "1px solid black";
+                headerTabelaDadosNaoIdentificados.append(headerDadosNomeNaoIdentificados);
+
+                const headerDadosValenciaNaoIdentificados = document.createElement('th');
+                headerDadosValenciaNaoIdentificados.innerHTML = "Valencia";
+                headerDadosValenciaNaoIdentificados.style.border = "1px solid black";
+                headerTabelaDadosNaoIdentificados.append(headerDadosValenciaNaoIdentificados);
+
+                const headerDadosSalaNaoIdentificados = document.createElement('th');
+                headerDadosSalaNaoIdentificados.innerHTML = "Sala";
+                headerDadosSalaNaoIdentificados.style.border = "1px solid black";
+                headerTabelaDadosNaoIdentificados.append(headerDadosSalaNaoIdentificados);
+ 
+                const headerDadosAutorizacaoNaoIdentificados = document.createElement('th');
+                headerDadosAutorizacaoNaoIdentificados.innerHTML = "Autorizacao";
+                headerDadosAutorizacaoNaoIdentificados.style.border = "1px solid black";
+                headerTabelaDadosNaoIdentificados.append(headerDadosAutorizacaoNaoIdentificados);
+
+                const headerDadosCorNaoIdentificados = document.createElement('th');
+                headerDadosCorNaoIdentificados.innerHTML = "Cor";
+                headerDadosCorNaoIdentificados.style.border = "1px solid black";
+                headerTabelaDadosNaoIdentificados.append(headerDadosCorNaoIdentificados);
+
+                
+                for(let i = 0; i < utentesVerificar.length; i++)
+                    {
+                        // Cria nova linha
+                        const linha = document.createElement('tr');
+                        linha.setAttribute('id', 'linhaNum' + (i + 1));
+                        tabelaDadosNaoIdentificados.append(linha);
+
+                        // Cria célula para nome de utilizador
+                        const nomeTd = document.createElement('td');
+                        linha.append(nomeTd);
+                        const nomeUtilizadorInput = document.createElement('input');
+                        nomeUtilizadorInput.setAttribute('id', 'nomeUtenteNaoIdentificado' + (i + 1));
                         nomeUtilizadorInput.placeholder = "Nome utilizador " + (i + 1);
                         nomeTd.append(nomeUtilizadorInput);
 
@@ -103,7 +252,7 @@ document.getElementById('addPublicacao').addEventListener('submit', async functi
                         const valenciaTd = document.createElement('td');
                         linha.append(valenciaTd);
                         const valenciaUtilizadorInput = document.createElement('input');
-                        valenciaUtilizadorInput.setAttribute('id', 'valencia' + (i + 1));
+                        valenciaUtilizadorInput.setAttribute('id', 'valenciaNaoIdentificado' + (i + 1));
                         valenciaUtilizadorInput.placeholder = "Valencia";
                         valenciaTd.append(valenciaUtilizadorInput);
 
@@ -111,7 +260,7 @@ document.getElementById('addPublicacao').addEventListener('submit', async functi
                         const salaTd = document.createElement('td');
                         linha.append(salaTd);
                         const salaUtilizadorInput = document.createElement('input');
-                        salaUtilizadorInput.setAttribute('id', 'Sala' + (i + 1));
+                        salaUtilizadorInput.setAttribute('id', 'SalaNaoIdentificado' + (i + 1));
                         salaUtilizadorInput.placeholder = "Sala";
                         salaTd.append(salaUtilizadorInput);
 
@@ -119,7 +268,7 @@ document.getElementById('addPublicacao').addEventListener('submit', async functi
                         const autTd = document.createElement('td');
                         linha.append(autTd);
                         const autUtilizadorInput = document.createElement('input');
-                        autUtilizadorInput.setAttribute('id', 'aut' + (i + 1));
+                        autUtilizadorInput.setAttribute('id', 'autNaoIdentificado' + (i + 1));
                         autUtilizadorInput.placeholder = "Autorizacao";
                         autTd.append(autUtilizadorInput);
 
@@ -127,27 +276,29 @@ document.getElementById('addPublicacao').addEventListener('submit', async functi
                         const corTd = document.createElement('td');
                         linha.append(corTd);
                         const corUtilizador = document.createElement('span');
-                        const primeiraCor = utentesVerificar[i].primeiraCor;
-                        const segundaCor = utentesVerificar[i].segundaCor;
-                        const terceiraCor = utentesVerificar[i].terceiraCor;
-                        corUtilizador.setAttribute('id', 'cor' + (i + 1));
+                        var primeiraCor = 0
+                        var segundaCor = 0
+                        var terceiraCor = 0
+                        primeiraCor = utentesVerificar[i].primeiraCor;   
+                        segundaCor = utentesVerificar[i].segundaCor;   
+                        terceiraCor = utentesVerificar[i].terceiraCor;   
+                        corUtilizador.setAttribute('id', 'corNaoIdentificado' + (i + 1));
                         corUtilizador.style.backgroundColor = `rgb(${primeiraCor}, ${segundaCor}, ${terceiraCor})`;
                         corUtilizador.innerHTML='.'
                         corTd.append(corUtilizador);
                     }
-
                 //Para adicionar o nome do utilizador, valencia, sala, aut, criar todas as caixas de text para o mesmo.
 
                 const sendCoordButtonAdd = document.createElement('button');
                 sendCoordButtonAdd.textContent = 'Adicionar Pessoa';
-                sendCoordButtonAdd.addEventListener('click',function(){
+                sendCoordButtonAdd.addEventListener('click',async function(){
                     for (let i = 0; i < utentesVerificar.length; i++)
                     {
-                        const nomeUtilizadorId = document.getElementById('nomeUtente'+(i+1));
-                        const valenciaUtilizadorId = document.getElementById('valencia'+(i+1));
-                        const salaUtilizadorId = document.getElementById('Sala'+(i+1));
-                        const autUtilizadorId = document.getElementById('aut'+(i+1));
-                        const corUtilizadorId = document.getElementById('cor'+(i+1));
+                        const nomeUtilizadorId = document.getElementById('nomeUtenteNaoIdentificado'+(i+1));
+                        const valenciaUtilizadorId = document.getElementById('valenciaNaoIdentificado'+(i+1));
+                        const salaUtilizadorId = document.getElementById('SalaNaoIdentificado'+(i+1));
+                        const autUtilizadorId = document.getElementById('autNaoIdentificado'+(i+1));
+                        const corUtilizadorId = document.getElementById('corNaoIdentificado'+(i+1));
                         const valorCor = window.getComputedStyle(corUtilizadorId);
                         const valorCorAux = valorCor.backgroundColor;
                         if (nomeUtilizadorId.value == "" && valenciaUtilizadorId.value == "" && salaUtilizadorId.value == "" 
@@ -166,25 +317,25 @@ document.getElementById('addPublicacao').addEventListener('submit', async functi
                             segundaCor = parseInt(rgbValues[1]);
                             terceiraCor = parseInt(rgbValues[2]); 
                         }
-                        enviarDadosPessoa(auxPosX, auxPosY, nomeUtilizador, valenciaUtilizador, salaUtilizador,
+                        await enviarDadosPessoa(auxPosX, auxPosY, nomeUtilizador, valenciaUtilizador, salaUtilizador,
                             autUtilizador, fotoOriginal, nomeFotoFicheiro, utentesVerificar, primeiraCor, segundaCor,
                                 terceiraCor);        
                     }
                 });
                 bodyTag.appendChild(sendCoordButtonAdd);
-                bodyTag.appendChild(sendCoordButton);
+                // bodyTag.appendChild(sendCoordButton);
                 buttonCreated = true; 
             }
         })
     } catch (error) {
         console.error(error);
-        alert('An error occurred while uploading the photo.');
+        alert('An error occurred while uploading the photo. ' + error);
     }
 });
 
 function getRelativePath(absolutePath)
 {
-    const projectPath = 'C:/Users/marco/source/repos/Projeto_PDS/ProjetoPDS/';
+    const projectPath = 'C:/Users/marco/source/repos/Projeto_PDS/ProjetoPDS/website/';
     const relativePath = '../' + absolutePath.substring(projectPath.length);
     return relativePath;
 }
@@ -249,4 +400,35 @@ async function enviarDadosPessoa(posX, posY, nome, valencia, sala, aut, nomeDire
         console.error(error);
         alert('Ocorreu um erro.');
     }
+}
+
+async function editarDadosPessoa(idUtilizadorBd, nome, valencia, sala, aut, utentesVerificados, primeiraCor, segundaCor, terceiraCor)
+{
+    alert('Estou a enviar dados para alterar uma pessoa.')
+    try
+    {
+        const formDataEditPessoa = new FormData();
+        formDataEditPessoa.append('idUtente', idUtilizadorBd);
+        formDataEditPessoa.append('nome', nome);
+        formDataEditPessoa.append('val',valencia);
+        formDataEditPessoa.append('sala',sala);
+        formDataEditPessoa.append('aut', aut);
+        formDataEditPessoa.append('utentesVerificados', JSON.stringify(utentesVerificados));
+        formDataEditPessoa.append('corP', primeiraCor)
+        formDataEditPessoa.append('corS', segundaCor)
+        formDataEditPessoa.append('corT', terceiraCor)
+        const apiURL = 'https://localhost:7248/Publicacao/EditarRegisto';
+        const requestOptionsPessoa = {
+            method:'PUT',
+            body: formDataEditPessoa,
+        };
+
+        const response = await fetch(apiURL, requestOptionsPessoa);
+        const data = await response.json();
+        console.log(data)
+    }
+    catch (error){
+        console.error(error);
+        alert('Ocorreu um erro.');
+    }       
 }

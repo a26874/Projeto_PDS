@@ -51,8 +51,11 @@ namespace ProjetoPDS.Controllers
             List<UtenteVerificar> utentesPorVerificar = new List<UtenteVerificar>();
 
             int idUtente = 0;
+            int todosEncodingsIterados = 0;
+            int idEncoding = 0;
             foreach (UtenteIdentificado utente in utentesIdentificados)
             {
+                todosEncodingsIterados = 0;
                 if (utente == null)
                     continue;
                 //Caso não existam encodings na base de dados.
@@ -74,14 +77,26 @@ namespace ProjetoPDS.Controllers
                         {
                             idUtente = encodingValue.UTENTEidUtente;
                             var infoUtente = baseDados.Utente.FirstOrDefault(u => u.idUtente == idUtente);
-                            if (infoUtente != null)
+                            var infoEncoding = baseDados.Encoding.FirstOrDefault(e => e.UTENTEidUtente == idUtente);
+                            if (infoUtente != null && infoEncoding!=null)
                             {
                                 utente.Nome = infoUtente.Nome;
                                 utente.Id = infoUtente.idUtente;
+                                utente.Encoding.idEncoding = infoEncoding.idEncoding;
+                                utente.Encoding.UTENTEidUtente = infoEncoding.UTENTEidUtente;
+                                Random numerosRandom = new Random();
+                                utente.PrimeiraCor = numerosRandom.Next(256);
+                                utente.SegundaCor = numerosRandom.Next(256);
+                                utente.TerceiraCor = numerosRandom.Next(256);
+                                utente.Valencia = infoUtente.Valencia;
+                                utente.Sala = infoUtente.Sala;
+                                utente.Autorizacao = infoUtente.Autorizacao;
+                                break;
                             }
                         }
-                        else
-                        {
+                        todosEncodingsIterados++;
+                        if(todosEncodingsIterados == todosEncoding.Count) 
+                        { 
                             UtenteVerificar ut = new UtenteVerificar();
                             ut.Right = utente.Right;
                             ut.Left = utente.Left;
@@ -89,19 +104,32 @@ namespace ProjetoPDS.Controllers
                             ut.Bottom = utente.Bottom;
                             ut.Encoding = utente.Encoding;
                             utentesPorVerificar.Add(ut);
-                        }
+                            break;
+                        }   
                     }
                 }
             }
+            List<UtenteIdentificado> auxListaUtentesIdentificados = new List<UtenteIdentificado>();
+            foreach(UtenteIdentificado u in utentesIdentificados)
+            {
+                if (u.Nome != null)
+                    auxListaUtentesIdentificados.Add(u);
+            }
+            //Criar metodo para mostraridentificados
             string nomeDiretorioAux = "";
+            string nomeFicheiroAux = "";
+            if(utentesIdentificados.Count>0)
+                nomeDiretorioAux = novoReconhecimento.MostrarIdentificados(nomeFicheiro, nomeDiretorio, auxListaUtentesIdentificados, out nomeFicheiroAux);
+                
             if (utentesPorVerificar.Count > 0)
-                nomeDiretorioAux = novoReconhecimento.MostrarNaoIdentificados(nomeFicheiro, nomeDiretorio, utentesPorVerificar);
+                nomeDiretorioAux = novoReconhecimento.MostrarNaoIdentificados(nomeFicheiroAux, nomeDiretorioAux, utentesPorVerificar);
             var fotoParaVerificar = new
             {
                 nomeFoto = nomeFicheiro,
                 listaNaoIdentificados = utentesPorVerificar,
                 fotoOriginal = nomeDiretorio,
                 diretorioFoto = nomeDiretorioAux,
+                listaIdentificados = auxListaUtentesIdentificados, 
             };
             return Ok(Json(fotoParaVerificar));
         }
@@ -143,7 +171,7 @@ namespace ProjetoPDS.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("RealizarRegisto")]
-        public async Task<IActionResult> AdicionarUtente([FromForm] string imagemOriginal, [FromForm] string nomeFoto, [FromForm] string nome, [FromForm] string val, [FromForm] string sala, [FromForm] int aut, [FromForm] int posX, [FromForm] int posY, [FromForm] string utentesPorVerificar
+        public async Task<IActionResult> AdicionarUtente([FromForm] string nome, [FromForm] string val, [FromForm] string sala, [FromForm] int aut, [FromForm] int posX, [FromForm] int posY, [FromForm] string utentesPorVerificar
                                                          , [FromForm] int corP, [FromForm] int corS, [FromForm] int corT)
         {
             if (val == null || posX <= 0 || posY <= 0 || sala == null || aut == 0 || nome == null || utentesPorVerificar == null)
@@ -152,29 +180,61 @@ namespace ProjetoPDS.Controllers
             FotoComDesfoque novoRegisto = new FotoComDesfoque();
             List<UtenteVerificar> listaRegisto = JsonConvert.DeserializeObject<List<UtenteVerificar>>(utentesPorVerificar);
             
-            List<Utente> listaNovosUtentes = novoRegisto.AdicionarUtenteBaseDados(listaRegisto, val, sala, aut, nome, corP, corS, corT, out List<Encoding> auxListaEncoding, baseDados);
+            Dictionary<Utente, Encoding> listaNovosUtentes = novoRegisto.AdicionarUtenteBaseDados(listaRegisto, val, sala, aut, nome, corP, corS, corT);
 
-            foreach(Utente novoUtente in listaNovosUtentes)
+            foreach(var u in listaNovosUtentes)
             {
-                foreach(Encoding novoEncoding in auxListaEncoding)
+                Utente utente = u.Key;
+                Encoding encoding = u.Value;
+             
+                var existeUtente = baseDados.Utente.FirstOrDefault(u => u.Nome == utente.Nome);
+                if(existeUtente!=null)
                 {
-                    int idUtente = 0;
-                    var existeUtente = baseDados.Utente.FirstOrDefault(u => u.Nome == novoUtente.Nome);
-                    if (existeUtente != null)
-                    {
-                        novoEncoding.UTENTEidUtente = existeUtente.idUtente;
-                        baseDados.Encoding.Add(novoEncoding);
-                        await baseDados.SaveChangesAsync();
-                    }
-                    else
-                    {
-                        baseDados.Utente.Add(novoUtente);
-                        await baseDados.SaveChangesAsync();
-                        novoEncoding.UTENTEidUtente = novoUtente.idUtente;
-                        baseDados.Encoding.Add(novoEncoding);
-                        await baseDados.SaveChangesAsync();
-                    }
+                    encoding.UTENTEidUtente = existeUtente.idUtente;
+                    baseDados.Encoding.Add(encoding);
+                    await baseDados.SaveChangesAsync();
                 }
+                else
+                {
+                    baseDados.Utente.Add(utente);
+                    await baseDados.SaveChangesAsync();
+                    encoding.UTENTEidUtente = utente.idUtente;
+                    baseDados.Encoding.Add(encoding);
+                    await baseDados.SaveChangesAsync();
+                }
+            }
+            return Ok();
+        }
+        /// <summary>
+        /// Edita um utente.
+        /// </summary>
+        /// <param name="nome"></param>
+        /// <param name="val"></param>
+        /// <param name="sala"></param>
+        /// <param name="aut"></param>
+        /// <param name="utentesVerificados"></param>
+        /// <returns></returns>
+        [HttpPut]
+        [Route("EditarRegisto")]
+
+        public async Task<IActionResult> EditarUtente([FromForm] int idUtente, [FromForm] string nome, [FromForm] string val, [FromForm] string sala, 
+            [FromForm] int aut, [FromForm] string utentesVerificados)
+        {
+            if (val == null || sala == null || aut == 0 || nome == null || utentesVerificados == null)
+                return BadRequest();
+            
+            List<UtenteIdentificado> listaExistentes = JsonConvert.DeserializeObject<List<UtenteIdentificado>>(utentesVerificados);
+
+            var existeUtente = baseDados.Utente.FirstOrDefault(u => u.idUtente == idUtente);
+            if(existeUtente!=null)
+            {
+                existeUtente.Nome = nome;
+                existeUtente.Sala = sala;
+                existeUtente.Valencia = val;
+                existeUtente.Autorizacao = aut;
+
+                baseDados.Update(existeUtente);
+                await baseDados.SaveChangesAsync();
             }
             return Ok();
         }

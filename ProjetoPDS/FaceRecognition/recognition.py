@@ -39,14 +39,17 @@ def singleRecognition(pathToFile):
         
 def compareEncoding(encoding1, encoding2):
     try:
-        face_encoding_1 = pickle.loads(encoding1)
-        face_encoding_2 = pickle.loads(encoding2)
-        
+        decoded_encoding1 = base64.b64decode(encoding1)
+        decoded_encoding2 = base64.b64decode(encoding2)
+
+        face_encoding_1 = pickle.loads(decoded_encoding1)
+        face_encoding_2 = pickle.loads(decoded_encoding2)
+
         if not isinstance(face_encoding_1, list):
             face_encoding_1 = [face_encoding_1]
         if not isinstance(face_encoding_2, list):
             face_encoding_2 = [face_encoding_2]
-        results = face_recognition.compare_faces(face_encoding_1, face_encoding_2)
+        results = face_recognition.compare_faces(face_encoding_1, face_encoding_2[0])
         return str(np.any(results))
     except IndexError:
         print('asd')
@@ -111,7 +114,25 @@ def censure_results_click(fileName, pathToFile, posX, posY, left, top, right, bo
             print('teste')
 
 
-def censure_results_2(fileName, pathToFile, firstColor, secondColor, thirdColor, left, top, right, bottom):
+def censure_results_identified(fileName, pathToFile, firstColor, secondColor, thirdColor, left, top, right, bottom):
+    image = cv2.imread(pathToFile)
+    cv2.rectangle(image, (left,top), (right,bottom),(firstColor, secondColor, thirdColor),2)
+    face_image = image[top:bottom, left:right]
+    image[top:bottom, left:right] = face_image
+    try:
+        currentDirectory = os.getcwd()
+        folderName = "Fotos_Por_Verificar"
+        newDirectory = os.path.join(currentDirectory, "website", "Imagens","Fotos_Por_Verificar")
+        if not os.path.exists(newDirectory):
+            os.makedirs(newDirectory)
+        newImage = os.path.join(newDirectory, fileName + ".jpg")
+        cv2.imwrite(newImage,image)
+        return newImage
+    except IndexError:
+        print('teste')    
+    
+
+def censure_results_non_identified(fileName, pathToFile, firstColor, secondColor, thirdColor, left, top, right, bottom):
     image = cv2.imread(pathToFile)
     cv2.rectangle(image, (left,top), (right,bottom),(firstColor, secondColor, thirdColor),2)
     face_image = image[top:bottom, left:right]
