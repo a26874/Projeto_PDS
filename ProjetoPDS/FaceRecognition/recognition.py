@@ -114,7 +114,25 @@ def censure_results_click(fileName, pathToFile, posX, posY, left, top, right, bo
             print('teste')
 
 
-def censure_results_2(fileName, pathToFile, firstColor, secondColor, thirdColor, left, top, right, bottom):
+def censure_results_identified(fileName, pathToFile, firstColor, secondColor, thirdColor, left, top, right, bottom):
+    image = cv2.imread(pathToFile)
+    cv2.rectangle(image, (left,top), (right,bottom),(firstColor, secondColor, thirdColor),2)
+    face_image = image[top:bottom, left:right]
+    image[top:bottom, left:right] = face_image
+    try:
+        currentDirectory = os.getcwd()
+        folderName = "Fotos_Por_Verificar"
+        newDirectory = os.path.join(currentDirectory, "website", "Imagens","Fotos_Por_Verificar")
+        if not os.path.exists(newDirectory):
+            os.makedirs(newDirectory)
+        newImage = os.path.join(newDirectory, fileName + ".jpg")
+        cv2.imwrite(newImage,image)
+        return newImage
+    except IndexError:
+        print('teste')    
+    
+
+def censure_results_non_identified(fileName, pathToFile, firstColor, secondColor, thirdColor, left, top, right, bottom):
     image = cv2.imread(pathToFile)
     cv2.rectangle(image, (left,top), (right,bottom),(firstColor, secondColor, thirdColor),2)
     face_image = image[top:bottom, left:right]

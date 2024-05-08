@@ -10,7 +10,6 @@
 using Newtonsoft.Json;
 using Python.Runtime;
 using System.ComponentModel.DataAnnotations;
-using System.Runtime.Serialization;
 
 namespace ProjetoPDS.Classes
 {
@@ -203,6 +202,39 @@ namespace ProjetoPDS.Classes
                 return exists;
             }
         }
+
+        /// <summary>
+        /// Cria uma nova imagem que irá conter todas as caras identificadas.
+        /// </summary>
+        /// <param name="nomeFicheiro"></param>
+        /// <param name="nomeDiretorio"></param>
+        /// <param name="listaVerificados"></param>
+        /// <returns></returns>
+        public string MostrarIdentificados(string nomeFicheiro, string nomeDiretorio, List<UtenteIdentificado> listaVerificados, out string nomeFicheiroAux)
+        {
+            string imagemVerificarPath = "";
+            dynamic facilRecMod = Py.Import("recognition");
+            dynamic loadEncFunc = facilRecMod.censure_results_identified;
+
+            bool firstIteration = false;
+            string auxNomeFicheiro = Path.GetFileNameWithoutExtension(nomeFicheiro);
+            Random numerosRandom = new Random();
+            foreach (UtenteIdentificado u in listaVerificados)
+            {
+                if (!firstIteration)
+                {
+                    dynamic execFunc = loadEncFunc(auxNomeFicheiro, nomeDiretorio, u.PrimeiraCor, u.SegundaCor, u.TerceiraCor, u.Left, u.Top, u.Right, u.Bottom);
+                    imagemVerificarPath = execFunc.ToString();
+                    firstIteration = true;
+                }
+                else
+                {
+                    dynamic execFunc = loadEncFunc(auxNomeFicheiro, imagemVerificarPath, u.PrimeiraCor, u.SegundaCor, u.TerceiraCor, u.Left, u.Top, u.Right, u.Bottom);
+                }
+            }
+            nomeFicheiroAux = Path.GetFileNameWithoutExtension(imagemVerificarPath);
+            return imagemVerificarPath;
+        }
         /// <summary>
         /// Cria uma nova imagem que irá conter todas as caras não identificadas.
         /// </summary>
@@ -218,7 +250,7 @@ namespace ProjetoPDS.Classes
                 sys.path.append(@"C:\Users\marco\source\repos\Projeto_PDS\ProjetoPDS\FaceRecognition");
 
                 dynamic facilRecMod = Py.Import("recognition");
-                dynamic loadEncFunc = facilRecMod.censure_results_2;
+                dynamic loadEncFunc = facilRecMod.censure_results_non_identified;
                 bool firstIteration = false;
                 string auxNomeFicheiro = Path.GetFileNameWithoutExtension(nomeFicheiro);
                 Random numerosRandom = new Random();
@@ -289,9 +321,7 @@ namespace ProjetoPDS.Classes
         /// <returns></returns>
         public Utente AdicionarUtenteClick(string nomeFic, string nomeDir, int posX, int posY, List<UtenteVerificar> listaUtentes, string val, string sala, int aut, string nome, int corP, int corS, int corT)
         {
-            //dynamic sys = Py.Import("sys");
-            //sys.path.append(@"C:\Users\marco\source\repos\Projeto_PDS\ProjetoPDS\FaceRecognition");
-
+            
             dynamic facilRecMod = Py.Import("recognition");
             dynamic loadEncFunc = facilRecMod.add_utente_click;
             bool existe = false;

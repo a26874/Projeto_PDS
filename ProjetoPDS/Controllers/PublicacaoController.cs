@@ -115,9 +115,14 @@ namespace ProjetoPDS.Controllers
                 if (u.Nome != null)
                     auxListaUtentesIdentificados.Add(u);
             }
+            //Criar metodo para mostraridentificados
             string nomeDiretorioAux = "";
+            string nomeFicheiroAux = "";
+            if(utentesIdentificados.Count>0)
+                nomeDiretorioAux = novoReconhecimento.MostrarIdentificados(nomeFicheiro, nomeDiretorio, auxListaUtentesIdentificados, out nomeFicheiroAux);
+                
             if (utentesPorVerificar.Count > 0)
-                nomeDiretorioAux = novoReconhecimento.MostrarNaoIdentificados(nomeFicheiro, nomeDiretorio, utentesPorVerificar);
+                nomeDiretorioAux = novoReconhecimento.MostrarNaoIdentificados(nomeFicheiroAux, nomeDiretorioAux, utentesPorVerificar);
             var fotoParaVerificar = new
             {
                 nomeFoto = nomeFicheiro,
@@ -166,7 +171,7 @@ namespace ProjetoPDS.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("RealizarRegisto")]
-        public async Task<IActionResult> AdicionarUtente([FromForm] string imagemOriginal, [FromForm] string nomeFoto, [FromForm] string nome, [FromForm] string val, [FromForm] string sala, [FromForm] int aut, [FromForm] int posX, [FromForm] int posY, [FromForm] string utentesPorVerificar
+        public async Task<IActionResult> AdicionarUtente([FromForm] string nome, [FromForm] string val, [FromForm] string sala, [FromForm] int aut, [FromForm] int posX, [FromForm] int posY, [FromForm] string utentesPorVerificar
                                                          , [FromForm] int corP, [FromForm] int corS, [FromForm] int corT)
         {
             if (val == null || posX <= 0 || posY <= 0 || sala == null || aut == 0 || nome == null || utentesPorVerificar == null)
@@ -203,29 +208,34 @@ namespace ProjetoPDS.Controllers
         /// <summary>
         /// Edita um utente.
         /// </summary>
-        /// <param name="imagemOriginal"></param>
-        /// <param name="nomeFoto"></param>
         /// <param name="nome"></param>
         /// <param name="val"></param>
         /// <param name="sala"></param>
         /// <param name="aut"></param>
-        /// <param name="posX"></param>
-        /// <param name="posY"></param>
         /// <param name="utentesVerificados"></param>
-        /// <param name="corP"></param>
-        /// <param name="corS"></param>
-        /// <param name="corT"></param>
         /// <returns></returns>
         [HttpPut]
-        [Route("RealizarRegisto")]
+        [Route("EditarRegisto")]
 
-        public async Task<IActionResult> EditarUtente([FromForm] string imagemOriginal, [FromForm] string nomeFoto, [FromForm] string nome, [FromForm] string val, [FromForm] string sala, [FromForm] int aut, [FromForm] int posX, [FromForm] int posY, [FromForm] string utentesVerificados
-                                                       , [FromForm] int corP, [FromForm] int corS, [FromForm] int corT)
+        public async Task<IActionResult> EditarUtente([FromForm] int idUtente, [FromForm] string nome, [FromForm] string val, [FromForm] string sala, 
+            [FromForm] int aut, [FromForm] string utentesVerificados)
         {
-            if (val == null || posX <= 0 || posY <= 0 || sala == null || aut == 0 || nome == null || utentesVerificados == null)
+            if (val == null || sala == null || aut == 0 || nome == null || utentesVerificados == null)
                 return BadRequest();
             
+            List<UtenteIdentificado> listaExistentes = JsonConvert.DeserializeObject<List<UtenteIdentificado>>(utentesVerificados);
 
+            var existeUtente = baseDados.Utente.FirstOrDefault(u => u.idUtente == idUtente);
+            if(existeUtente!=null)
+            {
+                existeUtente.Nome = nome;
+                existeUtente.Sala = sala;
+                existeUtente.Valencia = val;
+                existeUtente.Autorizacao = aut;
+
+                baseDados.Update(existeUtente);
+                await baseDados.SaveChangesAsync();
+            }
             return Ok();
         }
 

@@ -88,6 +88,11 @@ document.getElementById('addPublicacao').addEventListener('submit', async functi
                 headerTabelaDadosIdentificados.append(headerDadosCorIdentificados);
 
 
+                // Auxiliares para verificar se algum dos dados foram modificados.
+                const auxNomeUtilizadorInput = []
+                const auxValenciaUtilizadorInput = []
+                const auxSalaUtilizadorInput = []
+                const auxAutorizacaoInput = []
                 for(let i = 0 ; i < utentesVerificados.length; i++)
                     {
                         // Cria nova linha
@@ -142,13 +147,17 @@ document.getElementById('addPublicacao').addEventListener('submit', async functi
                         var primeiraCor = 0
                         var segundaCor = 0
                         var terceiraCor = 0
-                        primeiraCor = utentesVerificados[i].PrimeiraCor;   
-                        segundaCor = utentesVerificados[i].PrimeiraCor;   
-                        terceiraCor = utentesVerificados[i].PrimeiraCor;   
+                        primeiraCor = utentesVerificados[i].primeiraCor;   
+                        segundaCor = utentesVerificados[i].segundaCor;   
+                        terceiraCor = utentesVerificados[i].terceiraCor;   
                         corUtilizador.setAttribute('id', 'corIdentificado' + (i + 1));
                         corUtilizador.style.backgroundColor = `rgb(${primeiraCor}, ${segundaCor}, ${terceiraCor})`;
                         corUtilizador.innerHTML='.'
                         corTd.append(corUtilizador);
+                        auxNomeUtilizadorInput.push(nomeUtilizadorInput.value);
+                        auxValenciaUtilizadorInput.push(valenciaUtilizadorInput.value);
+                        auxSalaUtilizadorInput.push(salaUtilizadorInput.value);
+                        auxAutorizacaoInput.push(autUtilizadorInput.value);
                     }
                     const sendDataToEdit = document.createElement('button');
                     sendDataToEdit.textContent = 'Editar Pessoa(s)';
@@ -160,11 +169,14 @@ document.getElementById('addPublicacao').addEventListener('submit', async functi
                             const salaUtilizadorId = document.getElementById('SalaIdentificado'+(i+1));
                             const autUtilizadorId = document.getElementById('autIdentificado'+(i+1));
                             const corUtilizadorId = document.getElementById('corIdentificado'+(i+1));
+                            const idUtilizadorBd = utentesVerificados[i].id;
                             const valorCor = window.getComputedStyle(corUtilizadorId);
                             const valorCorAux = valorCor.backgroundColor;
-                            if (nomeUtilizadorId.value == "" && valenciaUtilizadorId.value == "" && salaUtilizadorId.value == "" 
-                                    && autUtilizadorId.value == "")
-                                        continue;
+                            if(auxNomeUtilizadorInput[i] == nomeUtilizadorId.value && 
+                               auxValenciaUtilizadorInput[i] == valenciaUtilizadorId.value &&
+                               auxSalaUtilizadorInput[i] == salaUtilizadorId.value &&
+                               auxAutorizacaoInput[i] == autUtilizadorId.value )
+                               continue;
                             nomeUtilizador = nomeUtilizadorId.value;
                             valenciaUtilizador = valenciaUtilizadorId.value;
                             salaUtilizador = salaUtilizadorId.value;
@@ -178,8 +190,8 @@ document.getElementById('addPublicacao').addEventListener('submit', async functi
                                 segundaCor = parseInt(rgbValues[1]);
                                 terceiraCor = parseInt(rgbValues[2]); 
                             }
-                            await editarDadosPessoas(auxPosX, auxPosY, nomeUtilizador, valenciaUtilizador, salaUtilizador,
-                                autUtilizador, fotoOriginal, nomeFotoFicheiro, utentesVerificados, primeiraCor, segundaCor,
+                            await editarDadosPessoa(idUtilizadorBd,nomeUtilizador, valenciaUtilizador, salaUtilizador,
+                                autUtilizador, utentesVerificados, primeiraCor, segundaCor,
                                     terceiraCor);        
                         }
                     })
@@ -267,9 +279,9 @@ document.getElementById('addPublicacao').addEventListener('submit', async functi
                         var primeiraCor = 0
                         var segundaCor = 0
                         var terceiraCor = 0
-                        primeiraCor = utentesVerificar[i].PrimeiraCor;   
-                        segundaCor = utentesVerificar[i].SegundaCor;   
-                        terceiraCor = utentesVerificar[i].TerceiraCor;   
+                        primeiraCor = utentesVerificar[i].primeiraCor;   
+                        segundaCor = utentesVerificar[i].segundaCor;   
+                        terceiraCor = utentesVerificar[i].terceiraCor;   
                         corUtilizador.setAttribute('id', 'corNaoIdentificado' + (i + 1));
                         corUtilizador.style.backgroundColor = `rgb(${primeiraCor}, ${segundaCor}, ${terceiraCor})`;
                         corUtilizador.innerHTML='.'
@@ -390,29 +402,25 @@ async function enviarDadosPessoa(posX, posY, nome, valencia, sala, aut, nomeDire
     }
 }
 
-async function editarDadosPessoas(posX, posY, nome, valencia, sala, aut, nomeDiretorio, nomeFotoFicheiro, utentesVerificados, primeiraCor,
-                                    segundaCor, terceiraCor)
+async function editarDadosPessoa(idUtilizadorBd, nome, valencia, sala, aut, utentesVerificados, primeiraCor, segundaCor, terceiraCor)
 {
     alert('Estou a enviar dados para alterar uma pessoa.')
     try
     {
-        const formDataPessoa = new FormData();
-        formDataPessoa.append('imagemOriginal', nomeDiretorio);
-        formDataPessoa.append('nomeFoto', nomeFotoFicheiro);
-        formDataPessoa.append('nome', nome);
-        formDataPessoa.append('val',valencia);
-        formDataPessoa.append('sala',sala);
-        formDataPessoa.append('aut', aut);
-        formDataPessoa.append('posX', posX);
-        formDataPessoa.append('posY', posY);
-        formDataPessoa.append('utentesVerificados', JSON.stringify(utentesVerificados));
-        formDataPessoa.append('corP', primeiraCor)
-        formDataPessoa.append('corS', segundaCor)
-        formDataPessoa.append('corT', terceiraCor)
+        const formDataEditPessoa = new FormData();
+        formDataEditPessoa.append('idUtente', idUtilizadorBd);
+        formDataEditPessoa.append('nome', nome);
+        formDataEditPessoa.append('val',valencia);
+        formDataEditPessoa.append('sala',sala);
+        formDataEditPessoa.append('aut', aut);
+        formDataEditPessoa.append('utentesVerificados', JSON.stringify(utentesVerificados));
+        formDataEditPessoa.append('corP', primeiraCor)
+        formDataEditPessoa.append('corS', segundaCor)
+        formDataEditPessoa.append('corT', terceiraCor)
         const apiURL = 'https://localhost:7248/Publicacao/EditarRegisto';
         const requestOptionsPessoa = {
             method:'PUT',
-            body: formDataPessoa,
+            body: formDataEditPessoa,
         };
 
         const response = await fetch(apiURL, requestOptionsPessoa);
