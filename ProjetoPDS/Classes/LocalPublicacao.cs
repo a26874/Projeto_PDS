@@ -11,6 +11,9 @@ using System.ComponentModel.DataAnnotations;
 
 namespace ProjetoPDS.Classes
 {
+    /// <summary>
+    /// Enumeração para o local de publicação.
+    /// </summary>
     public enum LocalPublicacao
     {
         SALA,

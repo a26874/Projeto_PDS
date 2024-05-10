@@ -17,6 +17,10 @@ namespace ProjetoPDS.Classes
         {
 
         }
+        /// <summary>
+        /// Aqui verifica se existe algum dos ids, para criação de novos ids a partir do ultimo inserido.
+        /// </summary>
+        /// <param name="modelBuilder"></param>
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Utente>().HasKey(u => u.idUtente); 

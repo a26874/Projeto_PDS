@@ -11,6 +11,9 @@ using System.ComponentModel.DataAnnotations;
 
 namespace ProjetoPDS.Classes
 {
+    /// <summary>
+    /// Classe para identificar uma foto de origem.
+    /// </summary>
     public class FotoOrigem
     {
         #region ATRIBUTOS

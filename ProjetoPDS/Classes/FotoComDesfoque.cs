@@ -13,6 +13,9 @@ using System.ComponentModel.DataAnnotations;
 
 namespace ProjetoPDS.Classes
 {
+    /// <summary>
+    /// Classe para trabalhar com foto e aplicar desfoque e identificação de utentes.
+    /// </summary>
     public class FotoComDesfoque
     {
         #region ATRIBUTOS
@@ -34,9 +37,13 @@ namespace ProjetoPDS.Classes
         /// </summary>
         static FotoComDesfoque()
         {
+            //Aqui é definido a localização do DLL de python.
             Runtime.PythonDLL = "C:\\Users\\marco\\AppData\\Local\\Programs\\Python\\Python311\\python311.dll";
+            //Não me lembro disto, mas para ter uma variavel igual a outra deve ser useless.
             PythonEngine.PythonPath = PythonEngine.PythonPath;
+            //Inicializa o python
             PythonEngine.Initialize();
+            //Isto é feito para dizer onde está o ficheiro de python, neste caso é o recognition (aqui é apenas a pasta).
             dynamic sys = Py.Import("sys");
             sys.path.append(@"C:\Users\marco\source\repos\Projeto_PDS\ProjetoPDS\FaceRecognition");
         }
@@ -118,27 +125,40 @@ namespace ProjetoPDS.Classes
         /// <returns></returns>
         public List<UtenteIdentificado> IdentificarUtentes(string pathToFile)
         {
-            dynamic sys = Py.Import("sys");
-
-            sys.path.append(@"C:\Users\marco\source\repos\Projeto_PDS\ProjetoPDS\FaceRecognition");
-
+            //Como lá em cima o folder do script de python foi definido para uma certa pasta, aqui só é necessário dar append do que
+            //está lá, neste caso o ficheiro em si.
             dynamic facilRecMod = Py.Import("recognition");
+            //É dado load do método que está no ficheiro, neste caso "recognition"
             dynamic loadEncFunc = facilRecMod.recognition;
 
+            //Aqui recebe o encoding que é retornado do resultado da função, tanto nesta função como em todas as outras que usam encodings
+            //É recebida a lista de encodings, que no ficheiro python esse encoding é convertido para binário e de seguida para uma string
+            //base64, assim será mais fácil de interpretar no C# pelo que pesquisei.
             dynamic auxEncoding = loadEncFunc(pathToFile);
 
-
+            //É criado um dicionário para guardar encodings e a localizações de caras.
             Dictionary<string, byte[]> encodingDict = new Dictionary<string, byte[]>();
 
+
+            //Por cada objecto de python na variável auxEncoding, transformamos a key que é sempre a localização da cara (uma tuple de 4 valores)
+            //para string. Também é criado uma nova variável para o valor do encoding recebido para aquela localização.
             foreach (PyObject key in auxEncoding)
             {
                 string faceLocation = key.ToString();
                 string base64encoding = auxEncoding[key].ToString();
+                //Aqui converte-se novamente para um array de bytes, conforme a string base64.
                 byte[] encoding = Convert.FromBase64String(base64encoding);
                 encodingDict.Add(faceLocation, encoding);
             }
 
+            //Criado uma nvoa lista de utentes que foram identificados. Não sei se é o melhor approach, porque depois uso esta classe para outra função
+            //Para já resulta.
             List<UtenteIdentificado> utentesIdentificados = new List<UtenteIdentificado>();
+            //Aqui percorremos também o dicionário que criamos acima, é divido a key que neste caso é a localização da cara nas partes necessárias
+            //Neste caso são 4. Por exemplo é recebido desta forma se me lembro corretamente (180,200,100,210) neste caso ficaria
+            //parts[0] = 180, parts[1] = 200, etc... A partir daqui é criado um novo utente, onde dizemos as localizações da cara, bottom, left... etc
+            //Também damos add do encoding a esse utente.
+            //No final é retornada a lista.
             foreach (var key in encodingDict)
             {
                 string[] parts = key.Key.Trim('(', ')').Split(',');
@@ -160,6 +180,7 @@ namespace ProjetoPDS.Classes
         /// <returns></returns>
         public byte[] addUtente(string pathToFile)
         {
+            //Isto foi uma função inicial para testes, penso que se pode apagar. Deixei sempre ficar só porque sim, ela já não é usada.
             using (Py.GIL())
             {
                 dynamic sys = Py.Import("sys");
@@ -183,17 +204,27 @@ namespace ProjetoPDS.Classes
         /// <returns></returns>
         public bool verificarEncoding(byte[] encoding1, byte[] encoding2)
         {
+            //Aqui é usado o GIL que é o interpretador global de python pelo que pesquisei. Acho que dá conflito quando é executado 2 vezes 
+            //Seguidas. Deste genero, por exemplo é usado o py.gil numa outra função anterior a esta, em principio tudo daria certo e de seguida
+            //Usariamos esta função, ao chegar novamente ao py.gil tem alturas que ele "falha" e nada acontece. Até que tem funções que retirei
+            //Isto do py.gil. Tirando isto esta função apenas chama uma outra função no python para comparar 2 encodings.
             using (Py.GIL())
             {
-                dynamic sys = Py.Import("sys");
-                sys.path.append(@"C:\Users\marco\source\repos\Projeto_PDS\ProjetoPDS\FaceRecognition");
+                //Este append do caminho da pasta onde o ficheiro python já está feito na inicialização da classe.
+                //dynamic sys = Py.Import("sys");
+                //sys.path.append(@"C:\Users\marco\source\repos\Projeto_PDS\ProjetoPDS\FaceRecognition");
 
+                //Convertemos ambos os encodings para json, assim é mais facil descodificar no python.
                 var auxEncoding1 = JsonConvert.SerializeObject(encoding1);
                 var auxEncoding2 = JsonConvert.SerializeObject(encoding2);
+                //Aqui é so dar novamente o nome do ficheiro e a função que queremos utilizar.
                 dynamic facilRecMod = Py.Import("recognition");
                 dynamic loadEncFunc = facilRecMod.compareEncoding;
 
+                //Aqui recebe como string se é verdade ou falso, não arranjei maneira de retornar o "True" or "False" porque aqui, depois
+                //não estou a conseguir converter esse objecto python em bool do c#
                 dynamic auxCompare = loadEncFunc(auxEncoding1, auxEncoding2);
+
 
                 bool exists = false;
                 string auxExist = auxCompare;
@@ -212,15 +243,26 @@ namespace ProjetoPDS.Classes
         /// <returns></returns>
         public string MostrarIdentificados(string nomeFicheiro, string nomeDiretorio, List<UtenteIdentificado> listaVerificados, out string nomeFicheiroAux)
         {
+            //Aqui é feito o mesmo processo para as funções de python.
             string imagemVerificarPath = "";
             dynamic facilRecMod = Py.Import("recognition");
             dynamic loadEncFunc = facilRecMod.censure_results_identified;
 
+            //Obtemos o nome do ficheiro sem a extensão, irá ser necessário para criar uma imagem auxiliar
             bool firstIteration = false;
             string auxNomeFicheiro = Path.GetFileNameWithoutExtension(nomeFicheiro);
+            //Aqui é usado random para criar valores entre 0 e 255 para atribuir uma "cor" a cada utente identificado, para ser possivel
+            //saber qual dos utentes é.
             Random numerosRandom = new Random();
             foreach (UtenteIdentificado u in listaVerificados)
             {
+                //Agora que vejo a ordem está "errada" devia ser se for a primeira iteração faz isto, se não faz o resto, mas dá a mesma cena
+                //É so trocar de false para true na inicialização.
+                //Basicamente aqui é executada a função censure_results_identified, o nome não é o mais indicado, porque apenas desenha os quadrados.
+                //Envia o nome do ficheiro e o diretório, ambos são necessários para depois escrever a nova imagem.
+                //É sempre recebido o caminho da nova imagem, como string.
+                //Caso já seja depois da primeira iteração, em vez de passarmos a imagem original pelo "nomeDiretorio" passamos a imagem auxiliar
+                //imagemVerificarPath, que já foi "reescrita" e já tem quadrados desenhados à volta de utentes.
                 if (!firstIteration)
                 {
                     dynamic execFunc = loadEncFunc(auxNomeFicheiro, nomeDiretorio, u.PrimeiraCor, u.SegundaCor, u.TerceiraCor, u.Left, u.Top, u.Right, u.Bottom);
@@ -232,46 +274,47 @@ namespace ProjetoPDS.Classes
                     dynamic execFunc = loadEncFunc(auxNomeFicheiro, imagemVerificarPath, u.PrimeiraCor, u.SegundaCor, u.TerceiraCor, u.Left, u.Top, u.Right, u.Bottom);
                 }
             }
+            //É dado um out desta variável, porque como esta função é sempre executada primeiro, se a imagem realmente for escrita com novos quadrados (identificações)
+            //Vai ser necessário path do ficheiro que contém as pessoas identificadas, para que depois ao executar a função de não identificados
+            //Já contenha o resultado desta imagem.
             nomeFicheiroAux = Path.GetFileNameWithoutExtension(imagemVerificarPath);
             return imagemVerificarPath;
         }
         /// <summary>
         /// Cria uma nova imagem que irá conter todas as caras não identificadas.
         /// </summary>
+        /// <param name="nomeFicheiro"></param>
         /// <param name="nomeDiretorio"></param>
         /// <param name="listaPorVerificar"></param>
         /// <returns></returns>
         public string MostrarNaoIdentificados(string nomeFicheiro, string nomeDiretorio, List<UtenteVerificar> listaPorVerificar)
         {
+            //Esta função é igual à função acima, apenas é gerado novas cores para cada um dos utentes que estão para verificar 
+            //(Utentes que não estão na base de dados, são utentes por verificar).
             string imagemVerificarPath = "";
-            using (Py.GIL())
-            {
-                dynamic sys = Py.Import("sys");
-                sys.path.append(@"C:\Users\marco\source\repos\Projeto_PDS\ProjetoPDS\FaceRecognition");
 
-                dynamic facilRecMod = Py.Import("recognition");
-                dynamic loadEncFunc = facilRecMod.censure_results_non_identified;
-                bool firstIteration = false;
-                string auxNomeFicheiro = Path.GetFileNameWithoutExtension(nomeFicheiro);
-                Random numerosRandom = new Random();
-                foreach (UtenteVerificar u in listaPorVerificar)
+            dynamic facilRecMod = Py.Import("recognition");
+            dynamic loadEncFunc = facilRecMod.censure_results_non_identified;
+            bool firstIteration = false;
+            string auxNomeFicheiro = Path.GetFileNameWithoutExtension(nomeFicheiro);
+            Random numerosRandom = new Random();
+            foreach (UtenteVerificar u in listaPorVerificar)
+            {
+                int primeiraCor = numerosRandom.Next(256);
+                int segundaCor = numerosRandom.Next(256);
+                int terceiraCor = numerosRandom.Next(256);
+                u.PrimeiraCor = primeiraCor;
+                u.SegundaCor = segundaCor;
+                u.TerceiraCor = terceiraCor;
+                if (!firstIteration)
                 {
-                    int primeiraCor = numerosRandom.Next(256);
-                    int segundaCor = numerosRandom.Next(256);
-                    int terceiraCor = numerosRandom.Next(256);
-                    u.PrimeiraCor = primeiraCor;
-                    u.SegundaCor = segundaCor;
-                    u.TerceiraCor = terceiraCor;
-                    if (!firstIteration)
-                    {
-                        dynamic execFunc = loadEncFunc(auxNomeFicheiro, nomeDiretorio, primeiraCor, segundaCor, terceiraCor, u.Left, u.Top, u.Right, u.Bottom);
-                        imagemVerificarPath = execFunc.ToString();
-                        firstIteration = true;
-                    }
-                    else
-                    {
-                        dynamic execFunc = loadEncFunc(auxNomeFicheiro, imagemVerificarPath, primeiraCor, segundaCor, terceiraCor, u.Left, u.Top, u.Right, u.Bottom);
-                    }
+                    dynamic execFunc = loadEncFunc(auxNomeFicheiro, nomeDiretorio, primeiraCor, segundaCor, terceiraCor, u.Left, u.Top, u.Right, u.Bottom);
+                    imagemVerificarPath = execFunc.ToString();
+                    firstIteration = true;
+                }
+                else
+                {
+                    dynamic execFunc = loadEncFunc(auxNomeFicheiro, imagemVerificarPath, primeiraCor, segundaCor, terceiraCor, u.Left, u.Top, u.Right, u.Bottom);
                 }
             }
             return imagemVerificarPath;
@@ -287,21 +330,17 @@ namespace ProjetoPDS.Classes
         /// <returns></returns>
         public string AplicarDesfoque(string nomeFicheiro, string nomeDiretorio, int posX, int posY, List<UtenteVerificar> listaUtentes)
         {
-            using (Py.GIL())
+            //Esta função vai ser a próxima a ser reescrita. Basicamente inicialmente ela apenas conforme a posição clicada na imagem no site
+            //Iria ver se estava dentro dos limites da cara no python e dar blur caso estivesse dentro da posição da cara.
+            dynamic facilRecMod = Py.Import("recognition");
+            dynamic loadEncFunc = facilRecMod.censure_results_click;
+            string fotoDesfocadaPath = "";
+            foreach (UtenteVerificar u in listaUtentes)
             {
-                dynamic sys = Py.Import("sys");
-                sys.path.append(@"C:\Users\marco\source\repos\Projeto_PDS\ProjetoPDS\FaceRecognition");
-
-                dynamic facilRecMod = Py.Import("recognition");
-                dynamic loadEncFunc = facilRecMod.censure_results_click;
-                string fotoDesfocadaPath = "";
-                foreach (UtenteVerificar u in listaUtentes)
-                {
-                    dynamic execFunc = loadEncFunc(nomeFicheiro, nomeDiretorio, posX, posY, u.Left, u.Top, u.Right, u.Bottom);
-                    fotoDesfocadaPath = execFunc.ToString();
-                }
-                return fotoDesfocadaPath;
+                dynamic execFunc = loadEncFunc(nomeFicheiro, nomeDiretorio, posX, posY, u.Left, u.Top, u.Right, u.Bottom);
+                fotoDesfocadaPath = execFunc.ToString();
             }
+            return fotoDesfocadaPath;
             #endregion
             #endregion
         }
@@ -321,7 +360,8 @@ namespace ProjetoPDS.Classes
         /// <returns></returns>
         public Utente AdicionarUtenteClick(string nomeFic, string nomeDir, int posX, int posY, List<UtenteVerificar> listaUtentes, string val, string sala, int aut, string nome, int corP, int corS, int corT)
         {
-            
+            //Visto que vai ser por "cor" ou a "tag" esta função torna-se useless, mas apenas conforme o click ela adicionava a pessoa à base
+            //de dados. Basicamente cria um novo utente caso ele esteja nos indices da imagem e envia o utente para o controller e dá add.
             dynamic facilRecMod = Py.Import("recognition");
             dynamic loadEncFunc = facilRecMod.add_utente_click;
             bool existe = false;
@@ -364,9 +404,14 @@ namespace ProjetoPDS.Classes
         /// <returns></returns>
         public Dictionary<Utente, Encoding> AdicionarUtenteBaseDados(List<UtenteVerificar> listaUtentes, string val, string sala, int aut, string nome, int corP, int corS, int corT)
         {
+            //Esta função trata de adicionar um utente à base de dados, ela irá receber do controller o nome da valencia, da sala, da autorização, do nome, e as cores.
+            //E a lista de utentes, por verificar.
             Dictionary<Utente, Encoding> novoListaUtentes = new Dictionary<Utente, Encoding>();
             bool existe = false;
 
+            //Por cada um dos utentes na lista verifica se a cor é a correspondente, caso não seja avança para o prox.
+            //Caso exista, cria um novo encoding e um novo utente, dá append das variáveis necessárias para todos os campos de cada classe.
+            //No final adiciona-se apenas ao dicionário, assim será mais fácil no controller percorrer cada utente que vai ser adicionado e o seu encoding correspondente.
             foreach (UtenteVerificar u in listaUtentes)
             {
                 if (!(u.PrimeiraCor == corP && u.SegundaCor == corS && u.TerceiraCor == corT))
@@ -401,7 +446,7 @@ namespace ProjetoPDS.Classes
         /// <returns></returns>
         public Utente EditarUtenteBaseDados(List<UtenteVerificar> listaUtentes, string val, string sala, int aut, string nome, int corP, int corS, int corT)
         {
-
+            //Esta função pode-se apagar, visto que está a editar no controlador e não aqui.
             bool editado = false;
 
             if (editado)
@@ -410,6 +455,7 @@ namespace ProjetoPDS.Classes
             }
             return null;
         }
+        //Criei um deconstrutor, para tentar corrigir aquele erro acima do py.gil, mas penso que isto não faz diferença
         ~FotoComDesfoque()
         {
             PythonEngine.Shutdown();

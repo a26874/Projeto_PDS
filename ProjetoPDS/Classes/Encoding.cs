@@ -12,6 +12,9 @@ using System.ComponentModel.DataAnnotations;
 
 namespace ProjetoPDS.Classes
 {
+    /// <summary>
+    /// Classe que identifica um encoding.
+    /// </summary>
     public class Encoding
     {
         #region ATRIBUTOS
@@ -24,6 +27,9 @@ namespace ProjetoPDS.Classes
         #region COMPORTAMENTO
 
         #region CONSTRUTORES
+        /// <summary>
+        /// Construtor por defeito.
+        /// </summary>
         public Encoding()
         {
 
