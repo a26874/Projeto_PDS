@@ -12,6 +12,9 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ProjetoPDS.Classes
 {
+    /// <summary>
+    /// Classe para um utente identificado.
+    /// </summary>
     public class UtenteIdentificado
     {
         #region ATRIBUTOS

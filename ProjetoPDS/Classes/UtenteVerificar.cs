@@ -9,6 +9,9 @@
 
 namespace ProjetoPDS.Classes
 {
+    /// <summary>
+    /// Classe para utentes que estão por verificar.
+    /// </summary>
     public class UtenteVerificar
     {
         #region ATRIBUTOS

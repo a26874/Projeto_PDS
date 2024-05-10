@@ -7,9 +7,12 @@ using System.Linq;
 
 namespace ProjetoPDS.Controllers
 {
+    /// <summary>
+    /// Todas as funções que estão aqui foram iniciais e apenas para teste. Já não são usadas nenhumas.
+    /// </summary>
     [ApiController]
     [Route("[controller]")]
-
+    
     public class UtenteController : Controller
     {
         private readonly string guardarFotoCaminho;
