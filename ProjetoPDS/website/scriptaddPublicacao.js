@@ -45,12 +45,6 @@ document.getElementById('addPublicacao').addEventListener('submit', async functi
             document.getElementById('posY').innerHTML= "Posicao Y:" + auxPosY;
 
             if (!buttonCreated) {
-                //Criar também para adicionar baseado no click
-                // const sendCoordButton = document.createElement('button');
-                // sendCoordButton.textContent = 'Desfocar';
-                // sendCoordButton.addEventListener('click', function() {
-                //     enviarCoords(auxPosX, auxPosY, absolutePath, fotoOriginal, utentesVerificar,nomeFotoFicheiro);
-                // });
 
                 const headerTabelaReconhecidos = document.createElement('h1')
                 headerTabelaReconhecidos.innerHTML = "Pessoas Reconhecidas: " + utentesVerificados.length
@@ -197,7 +191,7 @@ document.getElementById('addPublicacao').addEventListener('submit', async functi
                     })
                 bodyTag.appendChild(sendDataToEdit)
                 const headerTabelaNaoReconhecidos = document.createElement('h1')
-                headerTabelaNaoReconhecidos.innerHTML = "Pessoas Nao Reconhecidas: " + utentesVerificar.length
+                headerTabelaNaoReconhecidos.innerHTML = "Pessoas Não Reconhecidas: " + utentesVerificar.length
                 bodyTag.appendChild(headerTabelaNaoReconhecidos)
                     
                 //Criação de tabela para os utentes não verificados.
@@ -285,6 +279,7 @@ document.getElementById('addPublicacao').addEventListener('submit', async functi
                         corUtilizador.setAttribute('id', 'corNaoIdentificado' + (i + 1));
                         corUtilizador.style.backgroundColor = `rgb(${primeiraCor}, ${segundaCor}, ${terceiraCor})`;
                         corUtilizador.innerHTML='.'
+                        corUtilizador.style.color = `rgb(${primeiraCor}, ${segundaCor}, ${terceiraCor})`;
                         corTd.append(corUtilizador);
                     }
                 //Para adicionar o nome do utilizador, valencia, sala, aut, criar todas as caixas de text para o mesmo.
@@ -321,7 +316,28 @@ document.getElementById('addPublicacao').addEventListener('submit', async functi
                             autUtilizador, fotoOriginal, nomeFotoFicheiro, utentesVerificar, primeiraCor, segundaCor,
                                 terceiraCor);        
                     }
+
+                
                 });
+                const sendPessoaDesfoque = document.createElement('button');
+                sendPessoaDesfoque.textContent = 'Desfocar não reconhecidos';
+                sendPessoaDesfoque.addEventListener('click', async function(){
+                    var auxListaDesfocar = []
+                    for(let i = 0; i < utentesVerificar.length; i++)
+                        {
+                            const nomeUtilizadorId = document.getElementById('nomeUtenteNaoIdentificado'+(i+1));
+                            const valenciaUtilizadorId = document.getElementById('valenciaNaoIdentificado'+(i+1));
+                            const salaUtilizadorId = document.getElementById('SalaNaoIdentificado'+(i+1));
+                            const autUtilizadorId = document.getElementById('autNaoIdentificado'+(i+1));
+                            if (nomeUtilizadorId.value == "" && valenciaUtilizadorId.value == "" && salaUtilizadorId.value == "" 
+                                    && autUtilizadorId.value == "")
+                            {
+                                auxListaDesfocar.push(utentesVerificar[i])
+                            }
+                        }
+                            await enviarDadosPessoaDesfoque(fotoOriginal, nomeFotoFicheiro, absolutePath, auxListaDesfocar);       
+                    })
+                bodyTag.appendChild(sendPessoaDesfoque)
                 bodyTag.appendChild(sendCoordButtonAdd);
                 // bodyTag.appendChild(sendCoordButton);
                 buttonCreated = true; 
@@ -338,33 +354,6 @@ function getRelativePath(absolutePath)
     const projectPath = 'C:/Users/marco/source/repos/Projeto_PDS/ProjetoPDS/website/';
     const relativePath = '../' + absolutePath.substring(projectPath.length);
     return relativePath;
-}
-
-async function enviarCoords(posX, posY,absolutePath, nomeDiretorio, utentesVerificar, nomeFotoFicheiro)
-{
-    alert("Estou a enviar as coordenadas.");
-    try{
-        const formdataPos = new FormData();
-        formdataPos.append('posX',posX);
-        formdataPos.append('posY',posY);
-        formdataPos.append('urlFoto', absolutePath)
-        formdataPos.append('imagemOriginal', nomeDiretorio)
-        formdataPos.append('utentesPorVerificar', JSON.stringify(utentesVerificar))
-        formdataPos.append('nomeFoto', nomeFotoFicheiro)
-        const apiURL = 'https://localhost:7248/Publicacao/RealizarDesfoque';
-        const requestOptionsPos = {
-            method: 'POST',
-            body: formdataPos,
-        };
-        
-        const response = await fetch(apiURL, requestOptionsPos);
-        const data = await response.json();
-        console.log(data)
-    }
-    catch (error){
-        console.error(error);
-        alert('Ocorreu um erro.');
-    }
 }
 
 async function enviarDadosPessoa(posX, posY, nome, valencia, sala, aut, nomeDiretorio, nomeFotoFicheiro,utentesVerificar, primeiraCor
@@ -431,4 +420,44 @@ async function editarDadosPessoa(idUtilizadorBd, nome, valencia, sala, aut, uten
         console.error(error);
         alert('Ocorreu um erro.');
     }       
+}
+
+async function enviarDadosPessoaDesfoque(fotoOriginal, nomeFotoFicheiro, absolutePath, utentesVerificar)
+{
+    // esVerificar[i].bottom;
+    //                             await enviarDadosPessoaDesfoque(fotoOriginal, nomeFotoFicheiro, absolutePath, faceLeft,faceTop,faceRight
+    //                                 ,faceBottom);       
+    alert('Estou a desfocar pessoas.')
+    try
+    {
+        const formDataDesfoquePessoa = new FormData();
+        formDataDesfoquePessoa.append('fotoOriginal', fotoOriginal);
+        formDataDesfoquePessoa.append('nomeFotoFicheiro', nomeFotoFicheiro);
+        formDataDesfoquePessoa.append('absolutePath', absolutePath);
+        formDataDesfoquePessoa.append('utentesPorVerificar', JSON.stringify(utentesVerificar))
+        const apiURL = 'https://localhost:7248/Publicacao/RealizarDesfoque';
+        const requestOptions = {
+            method:'POST',
+            body: formDataDesfoquePessoa,
+        };
+
+        const response = await fetch(apiURL, requestOptions);
+        const data = await response.json();
+        
+        const fotoDesfocada = document.getElementById('fotoDesfocada');
+        fotoDesfocada.src = data.value.pathFotoDesfocada
+        // for(let i = 0; i < 4 ; i++)
+        //     {
+        //         const newBreak = document.createElement('br')
+        //         bodyTag.appendChild(newBreak);
+        //     }
+        // const novaImagem = document.createElement('img');
+        // novaImagem.src = data.value.pathFotoDesfocada
+        // bodyTag.appendChild(novaImagem)
+        console.log(data)
+    }
+    catch (error){
+        console.error(error);
+        alert('Ocorreu um erro.');
+    }
 }

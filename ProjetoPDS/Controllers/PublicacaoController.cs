@@ -164,27 +164,26 @@ namespace ProjetoPDS.Controllers
         }
         /// <summary>
         /// Na imagem caso seja clicado numa cara e escolhido a opção de censurar, irá verificar se está dentro dos limites identificados
-        /// e recorrer à censura.
         /// </summary>
-        /// <param name="imagemOriginal"></param>
-        /// <param name="nomeFoto"></param>
-        /// <param name="posX"></param>
-        /// <param name="posY"></param>
+        /// <param name="fotoOriginal"></param>
+        /// <param name="nomeFotoFicheiro"></param>
+        /// <param name="absolutePath"></param>
         /// <param name="utentesPorVerificar"></param>
         /// <returns></returns>
         [HttpPost]
         [Route("RealizarDesfoque")]
-        public async Task<IActionResult> Desfoque([FromForm] string imagemOriginal, [FromForm] string nomeFoto, [FromForm] int posX, [FromForm] int posY, [FromForm] string utentesPorVerificar)
+        public async Task<IActionResult> Desfoque([FromForm] string fotoOriginal, [FromForm] string nomeFotoFicheiro, [FromForm] string absolutePath, [FromForm] string utentesPorVerificar)
         {
             //Esta função é antiga, tem de ser reescrita, pois ainda está por click.
-            if (nomeFoto == null || posX == 0 || posY == 0 || utentesPorVerificar == null)
+            if (fotoOriginal == null)
                 return BadRequest();
 
             FotoComDesfoque novoDesfoque = new FotoComDesfoque();
+
             List<UtenteVerificar> listaDesfoque = JsonConvert.DeserializeObject<List<UtenteVerificar>>(utentesPorVerificar);
 
-            novoDesfoque.AplicarDesfoque(nomeFoto, imagemOriginal, posX, posY, listaDesfoque);
-            return Ok();
+            var pathFotoDesfocada = novoDesfoque.AplicarDesfoque(fotoOriginal, nomeFotoFicheiro, absolutePath,listaDesfoque);
+            return Ok(pathFotoDesfocada);
         }
         /// <summary>
         /// Realiza o registo de uma pessoa pelo click.
