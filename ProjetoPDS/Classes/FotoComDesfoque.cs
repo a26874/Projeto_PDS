@@ -173,29 +173,7 @@ namespace ProjetoPDS.Classes
             }
             return utentesIdentificados;
         }
-        /// <summary>
-        /// Retorna um encoding sozinho.
-        /// </summary>
-        /// <param name="pathToFile"></param>
-        /// <returns></returns>
-        public byte[] addUtente(string pathToFile)
-        {
-            //Isto foi uma função inicial para testes, penso que se pode apagar. Deixei sempre ficar só porque sim, ela já não é usada.
-            using (Py.GIL())
-            {
-                dynamic sys = Py.Import("sys");
 
-                sys.path.append(@"C:\Users\marco\source\repos\Projeto_PDS\ProjetoPDS\FaceRecognition");
-
-                dynamic facilRecMod = Py.Import("recognition");
-                dynamic loadEncFunc = facilRecMod.singleRecognition;
-
-                dynamic auxEncoding = loadEncFunc(pathToFile);
-
-                byte[] encoding = auxEncoding;
-                return encoding;
-            }
-        }
         /// <summary>
         /// Verifica se o encoding já existe na base de dados.
         /// </summary>
@@ -320,75 +298,41 @@ namespace ProjetoPDS.Classes
             return imagemVerificarPath;
         }
         /// <summary>
-        /// Aplica desfoque baseado no click.
+        /// Aplica desfoque.
         /// </summary>
-        /// <param name="nomeFicheiro"></param>
-        /// <param name="nomeDiretorio"></param>
-        /// <param name="posX"></param>
-        /// <param name="posY"></param>
+        /// <param name="fotoOriginal"></param>
+        /// <param name="nomeFotoFicheiro"></param>
+        /// <param name="absolutePath"></param>
         /// <param name="listaUtentes"></param>
         /// <returns></returns>
-        public string AplicarDesfoque(string nomeFicheiro, string nomeDiretorio, int posX, int posY, List<UtenteVerificar> listaUtentes)
+        public string AplicarDesfoque(string fotoOriginal, string nomeFotoFicheiro, string absolutePath, List<UtenteVerificar> listaUtentes)
         {
             //Esta função vai ser a próxima a ser reescrita. Basicamente inicialmente ela apenas conforme a posição clicada na imagem no site
             //Iria ver se estava dentro dos limites da cara no python e dar blur caso estivesse dentro da posição da cara.
             dynamic facilRecMod = Py.Import("recognition");
-            dynamic loadEncFunc = facilRecMod.censure_results_click;
+            dynamic loadEncFunc = facilRecMod.censure_results_utente;
             string fotoDesfocadaPath = "";
+            string auxNomeFicheiro = Path.GetFileNameWithoutExtension(nomeFotoFicheiro);
+            bool firstIteration = true;
             foreach (UtenteVerificar u in listaUtentes)
             {
-                dynamic execFunc = loadEncFunc(nomeFicheiro, nomeDiretorio, posX, posY, u.Left, u.Top, u.Right, u.Bottom);
-                fotoDesfocadaPath = execFunc.ToString();
-            }
-            return fotoDesfocadaPath;
-            #endregion
-            #endregion
-        }
-        /// <summary>
-        /// Verifica se o clique numa certa imagem está de acordo com o reconhecimento da cara.
-        /// Caso sim cria um novo utente com os dados e retorna esse mesmo utente para depois adicionar na base de dados.
-        /// </summary>
-        /// <param name="nomeFic"></param>
-        /// <param name="nomeDir"></param>
-        /// <param name="posX"></param>
-        /// <param name="posY"></param>
-        /// <param name="listaUtentes"></param>
-        /// <param name="val"></param>
-        /// <param name="sala"></param>
-        /// <param name="aut"></param>
-        /// <param name="nome"></param>
-        /// <returns></returns>
-        public Utente AdicionarUtenteClick(string nomeFic, string nomeDir, int posX, int posY, List<UtenteVerificar> listaUtentes, string val, string sala, int aut, string nome, int corP, int corS, int corT)
-        {
-            //Visto que vai ser por "cor" ou a "tag" esta função torna-se useless, mas apenas conforme o click ela adicionava a pessoa à base
-            //de dados. Basicamente cria um novo utente caso ele esteja nos indices da imagem e envia o utente para o controller e dá add.
-            dynamic facilRecMod = Py.Import("recognition");
-            dynamic loadEncFunc = facilRecMod.add_utente_click;
-            bool existe = false;
-            foreach (UtenteVerificar u in listaUtentes)
-            {
-                if (!(u.PrimeiraCor == corP && u.SegundaCor == corS && u.TerceiraCor == corT))
-                    continue;
-                dynamic execFunc = loadEncFunc(nomeFic, nomeDir, posX, posY, u.Left, u.Top, u.Right, u.Bottom);
-                string auxResult = execFunc.ToString();
-                if (auxResult == "True")
+                if (firstIteration)
                 {
-                    existe = true;
-                    break;
+                    dynamic execFunc = loadEncFunc(auxNomeFicheiro, fotoOriginal, u.Left, u.Top, u.Right, u.Bottom);
+                    fotoDesfocadaPath = execFunc.ToString();
+                    firstIteration = false;
+                }
+                else
+                {
+                    dynamic execFunc = loadEncFunc(auxNomeFicheiro, fotoDesfocadaPath, u.Left, u.Top, u.Right, u.Bottom);
+                    fotoDesfocadaPath = execFunc.ToString();
                 }
             }
-            if (existe)
-            {
-                Utente novoUtente = new Utente();
-                novoUtente.Nome = nome;
-                novoUtente.Sala = sala;
-                novoUtente.Valencia = val;
-                novoUtente.Autorizacao = aut;
-                return novoUtente;
-            }
-            return null;
-        }
 
+            return fotoDesfocadaPath;
+        }
+            #endregion
+            #endregion
         /// <summary>
         /// Adiciona um utente a base de dados, conforme os dados introduzidos no website. Como não irá ter nome para a pessoa inicialmente
         /// Verificamos a cor à qual ela está associada e criamos o novo utente.
@@ -432,29 +376,7 @@ namespace ProjetoPDS.Classes
             return novoListaUtentes;
         }
 
-        /// <summary>
-        /// Função para alterar dados de um utilizador na base de dados.
-        /// </summary>
-        /// <param name="listaUtentes"></param>
-        /// <param name="val"></param>
-        /// <param name="sala"></param>
-        /// <param name="aut"></param>
-        /// <param name="nome"></param>
-        /// <param name="corP"></param>
-        /// <param name="corS"></param>
-        /// <param name="corT"></param>
-        /// <returns></returns>
-        public Utente EditarUtenteBaseDados(List<UtenteVerificar> listaUtentes, string val, string sala, int aut, string nome, int corP, int corS, int corT)
-        {
-            //Esta função pode-se apagar, visto que está a editar no controlador e não aqui.
-            bool editado = false;
 
-            if (editado)
-            {
-
-            }
-            return null;
-        }
         //Criei um deconstrutor, para tentar corrigir aquele erro acima do py.gil, mas penso que isto não faz diferença
         ~FotoComDesfoque()
         {

@@ -22,6 +22,7 @@ namespace ProjetoPDS.Classes
         private int primeiraCor;
         private int segundaCor;
         private int terceiraCor;
+        private int autorizacao;
         private Encoding encoding;
         #endregion
 
