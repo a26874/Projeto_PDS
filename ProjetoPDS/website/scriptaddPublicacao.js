@@ -277,9 +277,9 @@ document.getElementById('addPublicacao').addEventListener('submit', async functi
                         segundaCor = utentesVerificar[i].segundaCor;   
                         terceiraCor = utentesVerificar[i].terceiraCor;   
                         corUtilizador.setAttribute('id', 'corNaoIdentificado' + (i + 1));
-                        corUtilizador.style.backgroundColor = `rgb(${primeiraCor}, ${segundaCor}, ${terceiraCor})`;
+                        corUtilizador.style.backgroundColor = `rgb(${terceiraCor}, ${segundaCor}, ${primeiraCor})`;
                         corUtilizador.innerHTML='.'
-                        corUtilizador.style.color = `rgb(${primeiraCor}, ${segundaCor}, ${terceiraCor})`;
+                        corUtilizador.style.color = `rgb(${terceiraCor}, ${segundaCor}, ${primeiraCor})`;
                         corTd.append(corUtilizador);
                     }
                 //Para adicionar o nome do utilizador, valencia, sala, aut, criar todas as caixas de text para o mesmo.
