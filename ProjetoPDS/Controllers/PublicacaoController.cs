@@ -150,7 +150,13 @@ namespace ProjetoPDS.Controllers
                 nomeDiretorioAux = novoReconhecimento.MostrarIdentificados(nomeFicheiro, nomeDiretorio, auxListaUtentesIdentificados, out nomeFicheiroAux);
             //Caso a lista tenha algum utente por verificar, faz o metodo de MostrarNãoIdentificados.
             if (utentesPorVerificar.Count > 0)
+                if (nomeFicheiroAux != "") { 
                 nomeDiretorioAux = novoReconhecimento.MostrarNaoIdentificados(nomeFicheiroAux, nomeDiretorioAux, utentesPorVerificar);
+                }
+                else
+                {
+                    nomeDiretorioAux = novoReconhecimento.MostrarNaoIdentificados(nomeFicheiro, nomeDiretorio, utentesPorVerificar);
+                }
             //Aqui envia de volta para o javascript algumas informações que são necessárias para criar tabelas com nomes etc.
             var fotoParaVerificar = new
             {

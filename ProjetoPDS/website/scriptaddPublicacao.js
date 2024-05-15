@@ -351,9 +351,14 @@ document.getElementById('addPublicacao').addEventListener('submit', async functi
 
 function getRelativePath(absolutePath)
 {
+    /*     
     const projectPath = 'C:/Users/marco/source/repos/Projeto_PDS/ProjetoPDS/website/';
     const relativePath = '../' + absolutePath.substring(projectPath.length);
-    return relativePath;
+    return relativePath;*/
+    const projectPath = 'C:/VisualStudioProjetos/Projeto_PDS/ProjetoPDS/website';
+    const relativePath = '.' + absolutePath.substring(projectPath.length);
+    const normalizedrelativePath = relativePath.replace(/\\/g, '/');
+    return normalizedrelativePath;
 }
 
 async function enviarDadosPessoa(posX, posY, nome, valencia, sala, aut, nomeDiretorio, nomeFotoFicheiro,utentesVerificar, primeiraCor

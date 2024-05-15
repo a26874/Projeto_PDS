@@ -38,14 +38,14 @@ namespace ProjetoPDS.Classes
         static FotoComDesfoque()
         {
             //Aqui é definido a localização do DLL de python.
-            Runtime.PythonDLL = "C:\\Users\\marco\\AppData\\Local\\Programs\\Python\\Python311\\python311.dll";
-            //Não me lembro disto, mas para ter uma variavel igual a outra deve ser useless.
-            PythonEngine.PythonPath = PythonEngine.PythonPath;
+            //Runtime.PythonDLL = "C:\\Users\\marco\\AppData\\Local\\Programs\\Python\\Python311\\python311.dll";
+            Runtime.PythonDLL = "C:/Users/user/AppData/Local/Programs/Python/Python311/python311.dll";
             //Inicializa o python
             PythonEngine.Initialize();
             //Isto é feito para dizer onde está o ficheiro de python, neste caso é o recognition (aqui é apenas a pasta).
             dynamic sys = Py.Import("sys");
-            sys.path.append(@"C:\Users\marco\source\repos\Projeto_PDS\ProjetoPDS\FaceRecognition");
+            //sys.path.append(@"C:\Users\marco\source\repos\Projeto_PDS\ProjetoPDS\FaceRecognition");
+            sys.path.append("C:/VisualStudioProjetos/Projeto_PDS/ProjetoPDS/FaceRecognition/");
         }
         /// <summary>
         /// Construtor por defeito.
@@ -128,6 +128,7 @@ namespace ProjetoPDS.Classes
             //Como lá em cima o folder do script de python foi definido para uma certa pasta, aqui só é necessário dar append do que
             //está lá, neste caso o ficheiro em si.
             dynamic facilRecMod = Py.Import("recognition");
+
             //É dado load do método que está no ficheiro, neste caso "recognition"
             dynamic loadEncFunc = facilRecMod.recognition;
 
@@ -331,8 +332,8 @@ namespace ProjetoPDS.Classes
 
             return fotoDesfocadaPath;
         }
-            #endregion
-            #endregion
+        #endregion
+        #endregion
         /// <summary>
         /// Adiciona um utente a base de dados, conforme os dados introduzidos no website. Como não irá ter nome para a pessoa inicialmente
         /// Verificamos a cor à qual ela está associada e criamos o novo utente.
