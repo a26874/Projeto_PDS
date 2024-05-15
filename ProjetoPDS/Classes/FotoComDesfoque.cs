@@ -326,7 +326,6 @@ namespace ProjetoPDS.Classes
                 else
                 {
                     dynamic execFunc = loadEncFunc(auxNomeFicheiro, fotoDesfocadaPath, u.Left, u.Top, u.Right, u.Bottom);
-                    fotoDesfocadaPath = execFunc.ToString();
                 }
             }
 
