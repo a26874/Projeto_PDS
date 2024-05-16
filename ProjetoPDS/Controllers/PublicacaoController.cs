@@ -41,24 +41,50 @@ namespace ProjetoPDS.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("VerificarPublicacao")]
-        public async Task<IActionResult> VerificarPublicacao([FromForm] Publicacao pub)
+        public async Task<IActionResult> VerificarPublicacao([FromForm] IFormFile pubFoto, [FromForm] string dataPub, [FromForm] int idUtlz, [FromForm] string Local)
         {
-            if (pub == null || pub.Foto == null)
+            if (pubFoto == null || dataPub == null || idUtlz <= 0|| Local == null)
                 return BadRequest();
             //Começamos por obter o nome do ficheiro, neste caso é o nome da imagem e o path onde ela vai ser guardada.
-            string nomeFicheiro = Path.GetFileName(pub.Foto.FileName);
+            Publicacao novaPublicacao = new Publicacao();
+            string nomeFicheiro = Path.GetFileName(pubFoto.FileName);
             string nomeDiretorio = Path.Combine(guardarFotoCaminho, nomeFicheiro);
 
 
             if (!Path.Exists(nomeDiretorio))
                 using (var stream = new FileStream(nomeDiretorio, FileMode.Create))
-                    await pub.Foto.CopyToAsync(stream);
+                    await pubFoto.CopyToAsync(stream);
+            
+            DateTime dataPublicacaoAux = Convert.ToDateTime(dataPub);
+            novaPublicacao.DataPublicacao = dataPublicacaoAux;
+            novaPublicacao.CaminhoFoto = nomeDiretorio;
+            novaPublicacao.IdUtilizador = idUtlz;
+            if(Local!=null)
+            {
+            if (Local == "EncEdc")
+                novaPublicacao.Local_Publicacaoid = LocalPublicacao.EncEduc + 1;
+            else if (Local == "Sala")
+                novaPublicacao.Local_Publicacaoid = LocalPublicacao.Sala + 1;
+            else if (Local == "Mural")
+                novaPublicacao.Local_Publicacaoid = LocalPublicacao.Mural + 1;
+            else if (Local == "Chat")
+                novaPublicacao.Local_Publicacaoid = LocalPublicacao.Chat + 1;
+            else
+                return BadRequest();
+            }
 
-            //Aqui dizemos que o path da foto é o nomeDiretorio.
-            pub.CaminhoFoto = nomeDiretorio;
-
-            //baseDados.Publicacao.Add(pub);
-            //await baseDados.SaveChangesAsync();
+            var existePublicacao = baseDados.Publicacao.FirstOrDefault(a => a.Publicacao_id== novaPublicacao.Publicacao_id);
+            if(existePublicacao != null)
+            {
+                novaPublicacao.Publicacao_id = existePublicacao.Publicacao_id;
+                baseDados.Publicacao.Add(novaPublicacao);
+                await baseDados.SaveChangesAsync();
+            }
+            else
+            {
+                baseDados.Publicacao.Add(novaPublicacao);
+                await baseDados.SaveChangesAsync();
+            }
 
             //Criado uma nova classe de fotocomdesfoque para identificar os utentes.
             FotoComDesfoque novoReconhecimento = new FotoComDesfoque();
@@ -150,7 +176,10 @@ namespace ProjetoPDS.Controllers
                 nomeDiretorioAux = novoReconhecimento.MostrarIdentificados(nomeFicheiro, nomeDiretorio, auxListaUtentesIdentificados, out nomeFicheiroAux);
             //Caso a lista tenha algum utente por verificar, faz o metodo de MostrarNãoIdentificados.
             if (utentesPorVerificar.Count > 0)
-                nomeDiretorioAux = novoReconhecimento.MostrarNaoIdentificados(nomeFicheiroAux, nomeDiretorioAux, utentesPorVerificar);
+                if(nomeFicheiroAux!="")
+                    nomeDiretorioAux = novoReconhecimento.MostrarNaoIdentificados(nomeFicheiroAux, nomeDiretorioAux, utentesPorVerificar);
+                else
+                    nomeDiretorioAux = novoReconhecimento.MostrarNaoIdentificados(nomeFicheiro, nomeDiretorio, utentesPorVerificar);
             //Aqui envia de volta para o javascript algumas informações que são necessárias para criar tabelas com nomes etc.
             var fotoParaVerificar = new
             {
@@ -162,119 +191,5 @@ namespace ProjetoPDS.Controllers
             };
             return Ok(Json(fotoParaVerificar));
         }
-        /// <summary>
-        /// Na imagem caso seja clicado numa cara e escolhido a opção de censurar, irá verificar se está dentro dos limites identificados
-        /// </summary>
-        /// <param name="fotoOriginal"></param>
-        /// <param name="nomeFotoFicheiro"></param>
-        /// <param name="absolutePath"></param>
-        /// <param name="utentesPorVerificar"></param>
-        /// <returns></returns>
-        [HttpPost]
-        [Route("RealizarDesfoque")]
-        public async Task<IActionResult> Desfoque([FromForm] string fotoOriginal, [FromForm] string nomeFotoFicheiro, [FromForm] string absolutePath, [FromForm] string utentesPorVerificar)
-        {
-            //Esta função é antiga, tem de ser reescrita, pois ainda está por click.
-            if (fotoOriginal == null)
-                return BadRequest();
-
-            FotoComDesfoque novoDesfoque = new FotoComDesfoque();
-
-            List<UtenteVerificar> listaDesfoque = JsonConvert.DeserializeObject<List<UtenteVerificar>>(utentesPorVerificar);
-
-            var pathFotoDesfocada = novoDesfoque.AplicarDesfoque(fotoOriginal, nomeFotoFicheiro, absolutePath,listaDesfoque);
-            return Ok(pathFotoDesfocada);
-        }
-        /// <summary>
-        /// Realiza o registo de uma pessoa pelo click.
-        /// </summary>
-        /// <param name="nome"></param>
-        /// <param name="val"></param>
-        /// <param name="sala"></param>
-        /// <param name="aut"></param>
-        /// <param name="posX"></param>
-        /// <param name="posY"></param>
-        /// <param name="utentesPorVerificar"></param>
-        /// <param name="corP"></param>
-        /// <param name="corS"></param>
-        /// <param name="corT"></param>
-        /// <returns></returns>
-        [HttpPost]
-        [Route("RealizarRegisto")]
-        public async Task<IActionResult> AdicionarUtente([FromForm] string nome, [FromForm] string val, [FromForm] string sala, [FromForm] int aut, [FromForm] int posX, [FromForm] int posY, [FromForm] string utentesPorVerificar
-                                                         , [FromForm] int corP, [FromForm] int corS, [FromForm] int corT)
-        {
-            if (val == null || posX <= 0 || posY <= 0 || sala == null || aut == 0 || nome == null || utentesPorVerificar == null)
-                return BadRequest();
-            //Aqui recebe a lista de todos os utentes do javascript e converte numa lista de utentes para verificar.
-            FotoComDesfoque novoRegisto = new FotoComDesfoque();
-            List<UtenteVerificar> listaRegisto = JsonConvert.DeserializeObject<List<UtenteVerificar>>(utentesPorVerificar);
-            
-            //É criado um novo dicionário de utentes e encodings, que irá receber do método AdicionarUtenteBaseDados.
-            Dictionary<Utente, Encoding> listaNovosUtentes = novoRegisto.AdicionarUtenteBaseDados(listaRegisto, val, sala, aut, nome, corP, corS, corT);
-
-            //Por cada utente no dicionário, obtém o utente e o encoding.
-            //Verifica se existe pelo nome (deveria ser pelo ID agora que penso) e caso exista o utente adiciona apenas o encoding.
-            //Caso contrário adiciona o utente e o encoding.
-            foreach(var u in listaNovosUtentes)
-            {
-                Utente utente = u.Key;
-                Encoding encoding = u.Value;
-             
-                var existeUtente = baseDados.Utente.FirstOrDefault(u => u.Nome == utente.Nome);
-                if(existeUtente!=null)
-                {
-                    encoding.UTENTEidUtente = existeUtente.idUtente;
-                    baseDados.Encoding.Add(encoding);
-                    await baseDados.SaveChangesAsync();
-                }
-                else
-                {
-                    baseDados.Utente.Add(utente);
-                    await baseDados.SaveChangesAsync();
-                    encoding.UTENTEidUtente = utente.idUtente;
-                    baseDados.Encoding.Add(encoding);
-                    await baseDados.SaveChangesAsync();
-                }
-            }
-            return Ok();
-        }
-        /// <summary>
-        /// Edita um utente.
-        /// </summary>
-        /// <param name="nome"></param>
-        /// <param name="val"></param>
-        /// <param name="sala"></param>
-        /// <param name="aut"></param>
-        /// <param name="utentesVerificados"></param>
-        /// <returns></returns>
-        [HttpPut]
-        [Route("EditarRegisto")]
-
-        public async Task<IActionResult> EditarUtente([FromForm] int idUtente, [FromForm] string nome, [FromForm] string val, [FromForm] string sala, 
-            [FromForm] int aut, [FromForm] string utentesVerificados)
-        {
-            //Aqui fazemos um put. Recebemos do javascript uma lista de utentes verificados
-            if (val == null || sala == null || aut == 0 || nome == null || utentesVerificados == null)
-                return BadRequest();
-            
-            //Convertemos para uma lista de utentes verificados do C#
-            List<UtenteIdentificado> listaExistentes = JsonConvert.DeserializeObject<List<UtenteIdentificado>>(utentesVerificados);
-
-            //Caso ele exista, é atribuido os novos campos que foram alterados.
-            var existeUtente = baseDados.Utente.FirstOrDefault(u => u.idUtente == idUtente);
-            if(existeUtente!=null)
-            {
-                existeUtente.Nome = nome;
-                existeUtente.Sala = sala;
-                existeUtente.Valencia = val;
-                existeUtente.Autorizacao = aut;
-
-                baseDados.Update(existeUtente);
-                await baseDados.SaveChangesAsync();
-            }
-            return Ok();
-        }
-
     }
 }

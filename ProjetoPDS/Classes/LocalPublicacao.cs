@@ -16,9 +16,9 @@ namespace ProjetoPDS.Classes
     /// </summary>
     public enum LocalPublicacao
     {
-        SALA,
-        GALERIA,
-        MURAL,
-        CHAT
+        EncEduc,
+        Sala,
+        Mural,
+        Chat
     }
 }

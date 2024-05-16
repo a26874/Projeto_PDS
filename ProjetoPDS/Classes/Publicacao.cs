@@ -7,6 +7,7 @@
 *	<description></description>
 **/
 
+using Microsoft.VisualBasic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -19,9 +20,9 @@ namespace ProjetoPDS.Classes
     {
         #region ATRIBUTOS
         [Key]
-        private int id;
-        private int idUtilizador;
-        private DateTime dataPublicacao;
+        private int publicacao_id;
+        private int idUtlz;
+        private DateTime dataPub;
         private LocalPublicacao local;
         private List<FotoOrigem> listaFotosOrigem;
         [NotMapped]
@@ -53,9 +54,9 @@ namespace ProjetoPDS.Classes
         /// <param name="caminhoFoto"></param>
         public Publicacao(int idPub, int idUtlz, DateTime dataPub, LocalPublicacao localPostagem, List<FotoOrigem> listaFotosOrigem, IFormFile fotoPub, string caminhoFoto)
         {
-            id = idPub;
-            idUtilizador= idUtlz;
-            dataPublicacao= dataPub;
+            publicacao_id= idPub;
+            this.idUtlz= idUtlz;
+            this.dataPub= dataPub;
             local = localPostagem;
             this.listaFotosOrigem = listaFotosOrigem;
             foto = fotoPub;
@@ -68,26 +69,26 @@ namespace ProjetoPDS.Classes
         /// <summary>
         /// Obter o id de publicação
         /// </summary>
-        public int Id
+        public int Publicacao_id
         {
-            get { return id; }
-            set { id = value; }
+            get { return publicacao_id; }
+            set { publicacao_id = value; }
         }
         /// <summary>
         /// Obter o id do utilizador.
         /// </summary>
         public int IdUtilizador
         {
-            get { return idUtilizador;}
-            set { idUtilizador = value;}
+            get { return idUtlz;}
+            set { idUtlz = value;}
         }
         /// <summary>
         /// Obter a data de publicação.
         /// </summary>
         public DateTime DataPublicacao
         { 
-            get { return dataPublicacao; }
-            set {  dataPublicacao = value; }
+            get { return dataPub; }
+            set {  dataPub = value; }
         }
         /// <summary>
         /// Obter o resultado do processamento da foto.
