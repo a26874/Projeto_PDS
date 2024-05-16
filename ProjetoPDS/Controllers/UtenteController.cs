@@ -7,10 +7,12 @@ namespace ProjetoPDS.Controllers
     /// <summary>
     /// Controlador para utentes.
     /// </summary>
-    public class UtentesController : Controller
+    [ApiController]
+    [Route("[controller]")]
+    public class UtenteController : Controller
     {
         private readonly dataBase baseDados;
-        public UtentesController(dataBase baseDados) 
+        public UtenteController(dataBase baseDados) 
         { 
             this.baseDados = baseDados;
         }

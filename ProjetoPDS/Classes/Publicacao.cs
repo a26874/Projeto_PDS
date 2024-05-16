@@ -24,7 +24,7 @@ namespace ProjetoPDS.Classes
         private int idUtlz;
         private DateTime dataPub;
         private LocalPublicacao local;
-        private List<FotoOrigem> listaFotosOrigem;
+        private List<Foto> listaFotosOrigem;
         [NotMapped]
         private IFormFile foto;
         private string? caminhoFoto;
@@ -52,7 +52,7 @@ namespace ProjetoPDS.Classes
         /// <param name="listaFotosOrigem"></param>
         /// <param name="fotoPub"></param>
         /// <param name="caminhoFoto"></param>
-        public Publicacao(int idPub, int idUtlz, DateTime dataPub, LocalPublicacao localPostagem, List<FotoOrigem> listaFotosOrigem, IFormFile fotoPub, string caminhoFoto)
+        public Publicacao(int idPub, int idUtlz, DateTime dataPub, LocalPublicacao localPostagem, List<Foto> listaFotosOrigem, IFormFile fotoPub, string caminhoFoto)
         {
             publicacao_id= idPub;
             this.idUtlz= idUtlz;
