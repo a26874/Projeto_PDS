@@ -25,7 +25,7 @@ namespace ProjetoPDS.Classes
         {
             modelBuilder.Entity<Utente>().HasKey(u => u.idUtente); 
             modelBuilder.Entity<Encoding>().HasKey(u => u.idEncoding);
-            modelBuilder.Entity<Publicacao>().HasKey(u => u.Id);
+            modelBuilder.Entity<Publicacao>().HasKey(u => u.Publicacao_id);
         }
 
 
