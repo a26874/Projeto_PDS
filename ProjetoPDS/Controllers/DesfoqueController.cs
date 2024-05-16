@@ -57,7 +57,7 @@ namespace ProjetoPDS.Controllers
                 {
                     auxNomeFicheiro = nomeFotoFicheiro + "_" + utente.Nome;
                     nomeFicheiros.Add(pathImages + "\\" + auxNomeFicheiro);
-                    
+                    //checkar se existe na base de dados uma imagem ja com esse nome, para nao haver duplicatas, se tiver coloca um _2 tipo isto
                     pathFotoDesfocada = novoDesfoque.AplicarDesfoque(fotoOriginal, auxNomeFicheiro, listaDesfoque, utente.Nome);
                     nomeFicheiros.Add(string.Copy(pathFotoDesfocada));
                 }
