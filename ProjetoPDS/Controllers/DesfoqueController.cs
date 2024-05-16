@@ -7,6 +7,8 @@ namespace ProjetoPDS.Controllers
     /// <summary>
     /// Controlador para fazer desfocagem.
     /// </summary>
+    [ApiController]
+    [Route("[controller]")]
     public class DesfoqueController : Controller
     {
         /// <summary>

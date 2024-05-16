@@ -309,7 +309,7 @@ document.getElementById('addPublicacao').addEventListener('submit', async functi
                         segundaCor = parseInt(rgbValues[1]);
                         terceiraCor = parseInt(rgbValues[2]); 
                     }
-                    await enviarDadosPessoa(auxPosX, auxPosY, nomeUtilizador, valenciaUtilizador, salaUtilizador,
+                    await enviarDadosPessoa( nomeUtilizador, valenciaUtilizador, salaUtilizador,
                         autUtilizador, fotoOriginal, nomeFotoFicheiro, utentesVerificar, primeiraCor, segundaCor,
                             terceiraCor);        
                 }
@@ -352,7 +352,7 @@ function getRelativePath(absolutePath)
     return relativePath;
 }
 
-async function enviarDadosPessoa(posX, posY, nome, valencia, sala, aut, nomeDiretorio, nomeFotoFicheiro,utentesVerificar, primeiraCor
+async function enviarDadosPessoa(nome, valencia, sala, aut, nomeDiretorio, nomeFotoFicheiro,utentesVerificar, primeiraCor
                                 , segundaCor, terceiraCor)
 {
     alert("Estou a enviar dados para adicionar a bd.");
@@ -364,14 +364,12 @@ async function enviarDadosPessoa(posX, posY, nome, valencia, sala, aut, nomeDire
         formDataPessoa.append('val',valencia);
         formDataPessoa.append('sala',sala);
         formDataPessoa.append('aut', aut);
-        formDataPessoa.append('posX', posX);
-        formDataPessoa.append('posY', posY);
         formDataPessoa.append('utentesPorVerificar', JSON.stringify(utentesVerificar));
         formDataPessoa.append('corP', primeiraCor)
         formDataPessoa.append('corS', segundaCor)
         formDataPessoa.append('corT', terceiraCor)
         
-        const apiURL = 'https://localhost:7248/Publicacao/RealizarRegisto';
+        const apiURL = 'https://localhost:7248/Utente/RealizarRegisto';
         const requestOptionsPessoa = {
             method:'POST',
             body: formDataPessoa,
@@ -402,7 +400,7 @@ async function editarDadosPessoa(idUtilizadorBd, nome, valencia, sala, aut, uten
         formDataEditPessoa.append('corP', primeiraCor)
         formDataEditPessoa.append('corS', segundaCor)
         formDataEditPessoa.append('corT', terceiraCor)
-        const apiURL = 'https://localhost:7248/Publicacao/EditarRegisto';
+        const apiURL = 'https://localhost:7248/Utente/EditarRegisto';
         const requestOptionsPessoa = {
             method:'PUT',
             body: formDataEditPessoa,

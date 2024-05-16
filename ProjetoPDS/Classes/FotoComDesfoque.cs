@@ -358,7 +358,7 @@ namespace ProjetoPDS.Classes
             //No final adiciona-se apenas ao dicionário, assim será mais fácil no controller percorrer cada utente que vai ser adicionado e o seu encoding correspondente.
             foreach (UtenteVerificar u in listaUtentes)
             {
-                if (!(u.PrimeiraCor == corP && u.SegundaCor == corS && u.TerceiraCor == corT))
+                if (!(u.PrimeiraCor == corT && u.SegundaCor == corS && u.TerceiraCor == corP))
                     continue;
                 existe = true;
                 if (existe)
