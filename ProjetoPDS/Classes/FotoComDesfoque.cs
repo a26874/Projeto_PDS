@@ -37,15 +37,16 @@ namespace ProjetoPDS.Classes
         /// </summary>
         static FotoComDesfoque()
         {
-            //Aqui é definido a localização do DLL de python.
-            Runtime.PythonDLL = "C:\\Users\\marco\\AppData\\Local\\Programs\\Python\\Python311\\python311.dll";
+            //Runtime.PythonDLL = "C:\\Users\\marco\\AppData\\Local\\Programs\\Python\\Python311\\python311.dll";
+            Runtime.PythonDLL = "C:/Users/user/AppData/Local/Programs/Python/Python311/python311.dll";
             //Não me lembro disto, mas para ter uma variavel igual a outra deve ser useless.
             PythonEngine.PythonPath = PythonEngine.PythonPath;
             //Inicializa o python
             PythonEngine.Initialize();
             //Isto é feito para dizer onde está o ficheiro de python, neste caso é o recognition (aqui é apenas a pasta).
             dynamic sys = Py.Import("sys");
-            sys.path.append(@"C:\Users\marco\source\repos\Projeto_PDS\ProjetoPDS\FaceRecognition");
+            //sys.path.append(@"C:\Users\marco\source\repos\Projeto_PDS\ProjetoPDS\FaceRecognition");
+            sys.path.append("C:/VisualStudioProjetos/Projeto_PDS/ProjetoPDS/FaceRecognition/");
         }
         /// <summary>
         /// Construtor por defeito.
@@ -305,7 +306,7 @@ namespace ProjetoPDS.Classes
         /// <param name="absolutePath"></param>
         /// <param name="listaUtentes"></param>
         /// <returns></returns>
-        public string AplicarDesfoque(string fotoOriginal, string nomeFotoFicheiro, string absolutePath, List<UtenteVerificar> listaUtentes)
+        public string AplicarDesfoque(string fotoOriginal, string nomeFotoFicheiro, List<UtenteVerificar> listaUtentes, string nomeAutorizacao)
         {
             //Esta função vai ser a próxima a ser reescrita. Basicamente inicialmente ela apenas conforme a posição clicada na imagem no site
             //Iria ver se estava dentro dos limites da cara no python e dar blur caso estivesse dentro da posição da cara.
@@ -316,6 +317,11 @@ namespace ProjetoPDS.Classes
             bool firstIteration = true;
             foreach (UtenteVerificar u in listaUtentes)
             {
+                if(u.Nome == nomeAutorizacao)
+                {
+                    //skippa o utente com o mesmo nome, devia ser o id, depois vemos
+                    continue;
+                }
                 if (firstIteration)
                 {
                     dynamic execFunc = loadEncFunc(auxNomeFicheiro, fotoOriginal, u.Left, u.Top, u.Right, u.Bottom);

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using ProjetoPDS.Classes;
+using System.Drawing;
 
 namespace ProjetoPDS.Controllers
 {
@@ -14,23 +15,56 @@ namespace ProjetoPDS.Controllers
         /// </summary>
         /// <param name="fotoOriginal"></param>
         /// <param name="nomeFotoFicheiro"></param>
-        /// <param name="absolutePath"></param>
         /// <param name="utentesPorVerificar"></param>
         /// <returns></returns>
         [HttpPost]
         [Route("RealizarDesfoque")]
-        public async Task<IActionResult> Desfoque([FromForm] string fotoOriginal, [FromForm] string nomeFotoFicheiro, [FromForm] string absolutePath, [FromForm] string utentesPorVerificar)
+        public async Task<IActionResult> Desfoque([FromForm] string fotoOriginal, [FromForm] string nomeFotoFicheiro, [FromForm] string absolutePath, [FromForm] string local, [FromForm] string utentesPorVerificar)
         {
-            //Esta função é antiga, tem de ser reescrita, pois ainda está por click.
+            int numbLocal = 0;
+            List<string> nomeFicheiros;
+            int lastIndex = absolutePath.LastIndexOf('/');
+            string pathImages = absolutePath.Substring(0, lastIndex);
+            string pathFotoDesfocada;
+            string auxNomeFicheiro;
+            nomeFicheiros = new List<string>();
+
+            if (local != null)
+            {
+                if (local == "EncEdc")
+                    numbLocal = 1;
+                else if (local == "Sala")
+                    numbLocal = 2;
+                else if (local == "Mural")
+                    numbLocal = 3;
+                else if (local == "Chat")
+                    numbLocal = 4;
+                else
+                    return BadRequest();
+            }
             if (fotoOriginal == null)
                 return BadRequest();
+            if (nomeFotoFicheiro == null)
+                return BadRequest();
+            nomeFicheiros.Add(nomeFotoFicheiro);
 
             FotoComDesfoque novoDesfoque = new FotoComDesfoque();
 
             List<UtenteVerificar> listaDesfoque = JsonConvert.DeserializeObject<List<UtenteVerificar>>(utentesPorVerificar);
-
-            var pathFotoDesfocada = novoDesfoque.AplicarDesfoque(fotoOriginal, nomeFotoFicheiro, absolutePath, listaDesfoque);
-            return Ok(pathFotoDesfocada);
+            foreach (UtenteVerificar utente in listaDesfoque)
+            {
+                if (utente.Autorizacao < numbLocal)
+                {
+                    auxNomeFicheiro = nomeFotoFicheiro + "_" + utente.Nome;
+                    nomeFicheiros.Add(pathImages + "\\" + auxNomeFicheiro);
+                    
+                    pathFotoDesfocada = novoDesfoque.AplicarDesfoque(fotoOriginal, auxNomeFicheiro, listaDesfoque, utente.Nome);
+                    nomeFicheiros.Add(string.Copy(pathFotoDesfocada));
+                }
+            }
+            pathFotoDesfocada = novoDesfoque.AplicarDesfoque(fotoOriginal, nomeFotoFicheiro, listaDesfoque, "");
+            nomeFicheiros.Add(string.Copy(pathFotoDesfocada));
+            return Ok(nomeFicheiros);
         }
     }
 }

@@ -41,9 +41,9 @@ namespace ProjetoPDS.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("VerificarPublicacao")]
-        public async Task<IActionResult> VerificarPublicacao([FromForm] IFormFile pubFoto, [FromForm] string dataPub, [FromForm] int idUtlz, [FromForm] string Local)
+        public async Task<IActionResult> VerificarPublicacao([FromForm] IFormFile pubFoto, [FromForm] string dataPub, [FromForm] int idUtlz, [FromForm] string local)
         {
-            if (pubFoto == null || dataPub == null || idUtlz <= 0|| Local == null)
+            if (pubFoto == null || dataPub == null || idUtlz <= 0|| local == null)
                 return BadRequest();
             //Começamos por obter o nome do ficheiro, neste caso é o nome da imagem e o path onde ela vai ser guardada.
             Publicacao novaPublicacao = new Publicacao();
@@ -59,15 +59,15 @@ namespace ProjetoPDS.Controllers
             novaPublicacao.DataPublicacao = dataPublicacaoAux;
             novaPublicacao.CaminhoFoto = nomeDiretorio;
             novaPublicacao.IdUtilizador = idUtlz;
-            if(Local!=null)
+            if(local!=null)
             {
-            if (Local == "EncEdc")
+            if (local == "EncEdc")
                 novaPublicacao.Local_Publicacaoid = LocalPublicacao.EncEduc + 1;
-            else if (Local == "Sala")
+            else if (local == "Sala")
                 novaPublicacao.Local_Publicacaoid = LocalPublicacao.Sala + 1;
-            else if (Local == "Mural")
+            else if (local == "Mural")
                 novaPublicacao.Local_Publicacaoid = LocalPublicacao.Mural + 1;
-            else if (Local == "Chat")
+            else if (local == "Chat")
                 novaPublicacao.Local_Publicacaoid = LocalPublicacao.Chat + 1;
             else
                 return BadRequest();
@@ -113,6 +113,7 @@ namespace ProjetoPDS.Controllers
                     ut.Top = utente.Top;
                     ut.Bottom = utente.Bottom;
                     ut.Encoding = utente.Encoding;
+                    ut.Autorizacao = utente.Autorizacao;
                     utentesPorVerificar.Add(ut);
                 }
                 else
