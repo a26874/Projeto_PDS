@@ -429,7 +429,7 @@ async function enviarDadosPessoaDesfoque(fotoOriginal, nomeFotoFicheiro, absolut
         formDataDesfoquePessoa.append('nomeFotoFicheiro', nomeFotoFicheiro);
         formDataDesfoquePessoa.append('absolutePath', absolutePath);
         formDataDesfoquePessoa.append('utentesPorVerificar', JSON.stringify(utentesVerificar))
-        const apiURL = 'https://localhost:7248/Publicacao/RealizarDesfoque';
+        const apiURL = 'https://localhost:7248/Desfoque/RealizarDesfoque';
         const requestOptions = {
             method:'POST',
             body: formDataDesfoquePessoa,

@@ -21,7 +21,7 @@ namespace ProjetoPDS.Classes
         private int id;
         private string fotoUrl;
         private int numeroTotalUtentes;
-        private int numeroIdenficados;
+        private int numeroIdentificados;
         private int numeroCensurados;
         private StatusFoto fotoStatusId;
         private int pubId;
@@ -30,9 +30,32 @@ namespace ProjetoPDS.Classes
         #region COMPORTAMENTO
 
         #region CONSTRUTORES
+        /// <summary>
+        /// Construtor por defeito.
+        /// </summary>
         public Foto()
         {
 
+        }
+        /// <summary>
+        /// Construtor por parametros.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="fotoUrl"></param>
+        /// <param name="numeroTotalUtentes"></param>
+        /// <param name="numeroIdentificados"></param>
+        /// <param name="numeroCensurados"></param>
+        /// <param name="fotoStatusId"></param>
+        /// <param name="pubId"></param>
+        public Foto(int id, string fotoUrl, int numeroTotalUtentes, int numeroIdentificados, int numeroCensurados, StatusFoto fotoStatusId, int pubId)
+        {
+            this.id = id;
+            this.fotoUrl = fotoUrl;
+            this.numeroTotalUtentes = numeroTotalUtentes;
+            this.numeroIdentificados = numeroIdentificados;
+            this.numeroCensurados = numeroCensurados;
+            this.fotoStatusId = fotoStatusId;
+            this.pubId = pubId;
         }
         #endregion
 
@@ -66,8 +89,8 @@ namespace ProjetoPDS.Classes
         /// </summary>
         public int numero_utentes_identificados
         {
-            get { return numeroIdenficados; }
-            set { numeroIdenficados = value; }
+            get { return numeroIdentificados; }
+            set { numeroIdentificados = value; }
         }
         /// <summary>
         /// Obter o numero de utentes censurados numa foto.

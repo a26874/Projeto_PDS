@@ -34,6 +34,18 @@ namespace ProjetoPDS.Classes
         {
 
         }
+        /// <summary>
+        /// Construtor por parametros.
+        /// </summary>
+        /// <param name="idEnc"></param>
+        /// <param name="enc"></param>
+        /// <param name="idUtente"></param>
+        public Encoding(int idEnc, byte[] enc, int idUtente)
+        {
+            this.idEnc = idEnc;
+            this.enc = enc;
+            this.idUtente = idUtente;
+        }
         #endregion
 
         #region PROPRIEDADES
