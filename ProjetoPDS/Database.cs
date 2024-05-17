@@ -17,15 +17,22 @@ namespace ProjetoPDS.Classes
         {
 
         }
+        /// <summary>
+        /// Aqui verifica se existe algum dos ids, para criação de novos ids a partir do ultimo inserido.
+        /// </summary>
+        /// <param name="modelBuilder"></param>
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Utente>().HasKey(u => u.idUtente); 
             modelBuilder.Entity<Encoding>().HasKey(u => u.idEncoding);
-            modelBuilder.Entity<Publicacao>().HasKey(u => u.Id);
+            modelBuilder.Entity<Publicacao>().HasKey(u => u.Publicacao_id);
+            modelBuilder.Entity<Foto>().HasKey(u => u.Foto_id);
         }
 
 
         public DbSet<Utente> Utente { get; set; }
         public DbSet<Encoding> Encoding { get; set; }
+        public DbSet<Publicacao> Publicacao { get; set; }
+        public DbSet<Foto> Foto { get; set; }
     }
 }

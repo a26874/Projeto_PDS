@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add utente</title>
+</head>
+<body>
+    <h1>Add user</h1>
+    <form id="addPublicacao" enctype="multipart/form-data" action="https://localhost:7248/Publicacao/VerificarPublicacao" method="post">
+        <input type="file" name="foto" accept="image/*">
+        <button type="submit">Upload Photo</button>
+        <br>
+        <br>
+        <br>
+        <br>
+        <input type="number" name="IdUtilizador" id="idUtlz">
+        <br>
+        <br>
+        <select name="localPost" id="localPostagem">
+            <option value="EncEdc">EncEdc</option>
+            <option value="Sala">Sala</option>
+            <option value="Mural">Mural</option>
+            <option value="Chat">Chat</option>
+        </select>
+    </form>
+    <br>
+    <br>
+    <img id="fotoParaVerificar" src="" >
+    <script src="scriptaddPublicacao.js"></script>
+
+    <br><br>
+    <img id="fotoDesfocada" src="">
+</body>
+</html>

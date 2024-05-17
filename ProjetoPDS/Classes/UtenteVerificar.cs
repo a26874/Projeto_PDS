@@ -9,10 +9,21 @@
 
 namespace ProjetoPDS.Classes
 {
+    /// <summary>
+    /// Classe para utentes que estão por verificar.
+    /// </summary>
     public class UtenteVerificar
     {
         #region ATRIBUTOS
-        private IFormFile foto;
+        private int cordTop;
+        private int cordBottom;
+        private int cordRight;
+        private int cordLeft;
+        private int primeiraCor;
+        private int segundaCor;
+        private int terceiraCor;
+        private int autorizacao;
+        private Encoding encoding;
         #endregion
 
         #region COMPORTAMENTO
@@ -26,12 +37,68 @@ namespace ProjetoPDS.Classes
 
         #region PROPRIEDADES
         /// <summary>
-        /// Obter informação sobre a foto
+        /// Obter cord top
         /// </summary>
-        public IFormFile Foto
+        public int Top
         {
-            get { return foto; }
-            set { foto = value; }
+            get { return cordTop; }
+            set { cordTop = value; }
+        }
+        /// <summary>
+        /// Obter cord bottom
+        /// </summary>
+        public int Bottom
+        {
+            get { return cordBottom; }
+            set { cordBottom = value; }
+        }
+        /// <summary>
+        /// Obter cord right
+        /// </summary>
+        public int Right
+        {
+            get { return cordRight; }
+            set { cordRight = value; }
+        }
+        /// <summary>
+        /// Obter cord left
+        /// </summary>
+        public int Left
+        {
+            get { return cordLeft; }
+            set { cordLeft = value; }
+        }
+        /// <summary>
+        /// Retorna o encoding
+        /// </summary>
+        public Encoding Encoding
+        {
+            get { return encoding; }
+            set { encoding = value; }
+        }
+        /// <summary>
+        /// Retorna das 3 cores para identificação a primeira associada.
+        /// </summary>
+        public int PrimeiraCor
+        {
+            get { return primeiraCor; }
+            set { primeiraCor = value; }
+        }
+        /// <summary>
+        /// Retorna das 3 cores para identificação a segunda associada.
+        /// </summary>
+        public int SegundaCor
+        {
+            get { return segundaCor; }
+            set { segundaCor = value; }
+        }
+        /// <summary>
+        /// Retorna das 3 cores para identificação a terceira associada.
+        /// </summary>
+        public int TerceiraCor
+        {
+            get { return terceiraCor; }
+            set { terceiraCor = value; }
         }
         #endregion
 

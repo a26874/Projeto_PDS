@@ -11,6 +11,9 @@ using System.ComponentModel.DataAnnotations;
 
 namespace ProjetoPDS.Classes
 {
+    /// <summary>
+    /// Enumeração para o estado da foto.
+    /// </summary>
     public enum StatusFoto
     {
         COMPLETO,

@@ -7,25 +7,27 @@
 *	<description></description>
 **/
 
+using Microsoft.VisualBasic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ProjetoPDS.Classes
 {
+    /// <summary>
+    /// Classe para identificação de uma publicação
+    /// </summary>
     public class Publicacao
     {
         #region ATRIBUTOS
         [Key]
-        private int id;
-        private int idUtilizador;
-        private DateTime dataPublicacao;
-        [NotMapped]
+        private int publicacao_id;
+        private int idUtlz;
+        private DateTime dataPub;
         private LocalPublicacao local;
-        private List<FotoOrigem> listaFotosOrigem;
+        private List<Foto> listaFotosOrigem;
         [NotMapped]
         private IFormFile foto;
-        //[NotMapped]
-        //private string caminhoFoto;
+        private string? caminhoFoto;
         //[NotMapped]
         //private string dataResult;
         #endregion
@@ -33,36 +35,60 @@ namespace ProjetoPDS.Classes
         #region COMPORTAMENTO
 
         #region CONSTRUTORES
+        /// <summary>
+        /// Construtor por defeito.
+        /// </summary>
         public Publicacao()
         {
 
         }
+        /// <summary>
+        /// Construtor com parametros.
+        /// </summary>
+        /// <param name="idPub"></param>
+        /// <param name="idUtlz"></param>
+        /// <param name="dataPub"></param>
+        /// <param name="localPostagem"></param>
+        /// <param name="listaFotosOrigem"></param>
+        /// <param name="fotoPub"></param>
+        /// <param name="caminhoFoto"></param>
+        public Publicacao(int idPub, int idUtlz, DateTime dataPub, LocalPublicacao localPostagem, List<Foto> listaFotosOrigem, IFormFile fotoPub, string caminhoFoto)
+        {
+            publicacao_id= idPub;
+            this.idUtlz= idUtlz;
+            this.dataPub= dataPub;
+            local = localPostagem;
+            this.listaFotosOrigem = listaFotosOrigem;
+            foto = fotoPub;
+            this.caminhoFoto = caminhoFoto;
+        }
+
         #endregion
 
         #region PROPRIEDADES
         /// <summary>
         /// Obter o id de publicação
         /// </summary>
-        public int Id
+        public int Publicacao_id
         {
-            get { return id; }
-            set { id = value; }
+            get { return publicacao_id; }
+            set { publicacao_id = value; }
         }
         /// <summary>
         /// Obter o id do utilizador.
         /// </summary>
         public int IdUtilizador
         {
-            get { return idUtilizador;}
-            set { idUtilizador = value;}
+            get { return idUtlz;}
+            set { idUtlz = value;}
         }
         /// <summary>
         /// Obter a data de publicação.
         /// </summary>
         public DateTime DataPublicacao
         { 
-            get { return dataPublicacao; }
-            set {  dataPublicacao = value; }
+            get { return dataPub; }
+            set {  dataPub = value; }
         }
         /// <summary>
         /// Obter o resultado do processamento da foto.
@@ -76,8 +102,7 @@ namespace ProjetoPDS.Classes
         /// <summary>
         /// Obter o local de publicação da foto.
         /// </summary>
-        [NotMapped]
-        public LocalPublicacao Local
+        public LocalPublicacao Local_Publicacaoid
         {
             get { return local; }
             set { local = value; }
@@ -85,12 +110,11 @@ namespace ProjetoPDS.Classes
         /// <summary>
         /// Obter o url da foto.
         /// </summary>
-        //[NotMapped]
-        //public string CaminhoFoto
-        //{
-        //    get { return caminhoFoto;}
-        //    set { caminhoFoto = value;}
-        //}
+        public string? CaminhoFoto
+        {
+            get { return caminhoFoto; }
+            set { caminhoFoto = value; }
+        }
         /// <summary>
         /// Obter a foto da publicação
         /// </summary>

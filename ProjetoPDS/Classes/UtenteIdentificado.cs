@@ -12,6 +12,9 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ProjetoPDS.Classes
 {
+    /// <summary>
+    /// Classe para um utente identificado.
+    /// </summary>
     public class UtenteIdentificado
     {
         #region ATRIBUTOS
@@ -21,6 +24,12 @@ namespace ProjetoPDS.Classes
         private int cordBottom;
         private int cordRight;
         private int cordLeft;
+        private int primeiraCor;
+        private int segundaCor;
+        private int terceiraCor;
+        private string valencia;
+        private string sala;
+        private int autorizacao;
         private Encoding encoding;
         #endregion
 
@@ -103,6 +112,54 @@ namespace ProjetoPDS.Classes
         {
             get { return encoding; }
             set { encoding = value; }
+        }
+        /// <summary>
+        /// Retorna a primeira cor
+        /// </summary>
+        public int PrimeiraCor
+        {
+            get { return primeiraCor; }
+            set { primeiraCor = value; }
+        }
+        /// <summary>
+        /// Retorna a segunda cor
+        /// </summary>
+        public int SegundaCor
+        {
+            get { return segundaCor; }
+            set { segundaCor = value; }
+        }
+        /// <summary>
+        /// Retorna a terceira cor.
+        /// </summary>
+        public int TerceiraCor
+        {
+            get { return terceiraCor; }
+            set { terceiraCor = value; }
+        }
+        /// <summary>
+        /// Obter a sala
+        /// </summary>
+        public string Sala
+        {
+            get { return sala; }
+            set { sala = value; }
+        }
+        /// <summary>
+        /// Obter a valencia
+        /// </summary>
+        public string Valencia
+        {
+            get { return valencia; }
+            set { valencia = value; }
+        }
+        /// <summary>
+        /// Obter a autorizacao
+        /// </summary>
+        public int Autorizacao
+        {
+            get { return autorizacao; }
+            set { autorizacao = value; }
         }
         #endregion
 

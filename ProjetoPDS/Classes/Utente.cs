@@ -12,6 +12,9 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ProjetoPDS.Classes
 {
+    /// <summary>
+    /// Classe para um utente.
+    /// </summary>
     public class Utente
     {
         #region ATRIBUTOS
@@ -44,7 +47,6 @@ namespace ProjetoPDS.Classes
         /// <param name="sala"></param>
         /// <param name="autorizacao"></param>
         /// <param name="foto"></param>
-        /// <param name="caminhoFoto"></param>
         public Utente(string nome, string valencia, string sala, int autorizacao, IFormFile foto)
         {
             this.nome = nome;
@@ -101,7 +103,9 @@ namespace ProjetoPDS.Classes
             set { uploadFoto = value; }
             get { return uploadFoto; }
         }
-
+        /// <summary>
+        /// Obter id do utente
+        /// </summary>
         public int idUtente
         {
             get {  return id; } 
