@@ -23,8 +23,7 @@ namespace ProjetoPDS.Controllers
         {
             int numbLocal = 0;
             List<string> nomeFicheiros;
-            int lastIndex = absolutePath.LastIndexOf('/');
-            string pathImages = absolutePath.Substring(0, lastIndex);
+            string pathImages = "C:\\VisualStudioProjetos\\Projeto_PDS\\ProjetoPDS\\website\\Imagens\\Fotos_Desfocadas";
             string pathFotoDesfocada;
             string auxNomeFicheiro;
             nomeFicheiros = new List<string>();
@@ -56,9 +55,9 @@ namespace ProjetoPDS.Controllers
                 if (utente.Autorizacao < numbLocal)
                 {
                     auxNomeFicheiro = nomeFotoFicheiro + "_" + utente.Nome;
-                    nomeFicheiros.Add(pathImages + "\\" + auxNomeFicheiro);
+                    nomeFicheiros.Add(pathImages + "\\" + auxNomeFicheiro + ".png");
                     //checkar se existe na base de dados uma imagem ja com esse nome, para nao haver duplicatas, se tiver coloca um _2 tipo isto
-                    pathFotoDesfocada = novoDesfoque.AplicarDesfoque(fotoOriginal, auxNomeFicheiro, listaDesfoque, utente.Nome);
+                    pathFotoDesfocada = novoDesfoque.AplicarDesfoque(fotoOriginal, pathImages + "\\" + auxNomeFicheiro + ".png"/*auxNomeFicheiro*/, listaDesfoque, utente.Nome);
                     nomeFicheiros.Add(string.Copy(pathFotoDesfocada));
                 }
             }

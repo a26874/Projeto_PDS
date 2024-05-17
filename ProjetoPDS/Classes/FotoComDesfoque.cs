@@ -10,6 +10,8 @@
 using Newtonsoft.Json;
 using Python.Runtime;
 using System.ComponentModel.DataAnnotations;
+using System.Drawing;
+using System.Drawing.Imaging;
 
 namespace ProjetoPDS.Classes
 {
@@ -310,16 +312,24 @@ namespace ProjetoPDS.Classes
         {
             //Esta função vai ser a próxima a ser reescrita. Basicamente inicialmente ela apenas conforme a posição clicada na imagem no site
             //Iria ver se estava dentro dos limites da cara no python e dar blur caso estivesse dentro da posição da cara.
-            dynamic facilRecMod = Py.Import("recognition");
-            dynamic loadEncFunc = facilRecMod.censure_results_utente;
-            string fotoDesfocadaPath = "";
+            //dynamic facilRecMod = Py.Import("recognition");
+            //dynamic loadEncFunc = facilRecMod.censure_results_utente;
+            
+            Image original = Image.FromFile(fotoOriginal);
+            string fotoDesfocadaPath = nomeFotoFicheiro;
+            original.Save(fotoDesfocadaPath, ImageFormat.Png);
+
+            return fotoDesfocadaPath;
+            
+            /*
             string auxNomeFicheiro = Path.GetFileNameWithoutExtension(nomeFotoFicheiro);
             bool firstIteration = true;
+            
             foreach (UtenteVerificar u in listaUtentes)
             {
                 if(u.Nome == nomeAutorizacao)
                 {
-                    //skippa o utente com o mesmo nome, devia ser o id, depois vemos
+                    //skippa o utente com o mesmo nome antes verificado pela autorização, devia ser o id, depois vemos
                     continue;
                 }
                 if (firstIteration)
@@ -334,7 +344,7 @@ namespace ProjetoPDS.Classes
                     fotoDesfocadaPath = execFunc.ToString();
                 }
             }
-
+            */
             return fotoDesfocadaPath;
         }
             #endregion
