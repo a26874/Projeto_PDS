@@ -10,6 +10,8 @@
 using Newtonsoft.Json;
 using Python.Runtime;
 using System.ComponentModel.DataAnnotations;
+using System.Drawing.Imaging;
+
 
 namespace ProjetoPDS.Classes
 {
@@ -305,31 +307,36 @@ namespace ProjetoPDS.Classes
         /// <param name="absolutePath"></param>
         /// <param name="listaUtentes"></param>
         /// <returns></returns>
-        public string AplicarDesfoque(string fotoOriginal, string nomeFotoFicheiro, string absolutePath, List<UtenteVerificar> listaUtentes)
+        public string AplicarDesfoque(string fotoOriginal, string nomeFotoFicheiro, List<UtenteVerificar> listaUtentes, string nomeAutorizacao)
         {
-            //Esta função vai ser a próxima a ser reescrita. Basicamente inicialmente ela apenas conforme a posição clicada na imagem no site
-            //Iria ver se estava dentro dos limites da cara no python e dar blur caso estivesse dentro da posição da cara.
-            dynamic facilRecMod = Py.Import("recognition");
-            dynamic loadEncFunc = facilRecMod.censure_results_utente;
-            string fotoDesfocadaPath = "";
-            string auxNomeFicheiro = Path.GetFileNameWithoutExtension(nomeFotoFicheiro);
-            bool firstIteration = true;
-            foreach (UtenteVerificar u in listaUtentes)
-            {
-                if (firstIteration)
-                {
-                    dynamic execFunc = loadEncFunc(auxNomeFicheiro, fotoOriginal, u.Left, u.Top, u.Right, u.Bottom);
-                    fotoDesfocadaPath = execFunc.ToString();
-                    firstIteration = false;
-                }
-                else
-                {
-                    dynamic execFunc = loadEncFunc(auxNomeFicheiro, fotoDesfocadaPath, u.Left, u.Top, u.Right, u.Bottom);
-                    fotoDesfocadaPath = execFunc.ToString();
-                }
-            }
+            System.Drawing.Image original = System.Drawing.Image.FromFile(fotoOriginal);
+            string fotoDesfocadaPath = nomeFotoFicheiro;
+            original.Save(fotoDesfocadaPath, ImageFormat.Png);
 
             return fotoDesfocadaPath;
+            //Esta função vai ser a próxima a ser reescrita. Basicamente inicialmente ela apenas conforme a posição clicada na imagem no site
+            //Iria ver se estava dentro dos limites da cara no python e dar blur caso estivesse dentro da posição da cara.
+            //dynamic facilRecMod = Py.Import("recognition");
+            //dynamic loadEncFunc = facilRecMod.censure_results_utente;
+            //string fotoDesfocadaPath = "";
+            //string auxNomeFicheiro = Path.GetFileNameWithoutExtension(nomeFotoFicheiro);
+            //bool firstIteration = true;
+            //foreach (UtenteVerificar u in listaUtentes)
+            //{
+            //    if (firstIteration)
+            //    {
+            //        dynamic execFunc = loadEncFunc(auxNomeFicheiro, fotoOriginal, u.Left, u.Top, u.Right, u.Bottom);
+            //        fotoDesfocadaPath = execFunc.ToString();
+            //        firstIteration = false;
+            //    }
+            //    else
+            //    {
+            //        dynamic execFunc = loadEncFunc(auxNomeFicheiro, fotoDesfocadaPath, u.Left, u.Top, u.Right, u.Bottom);
+            //        fotoDesfocadaPath = execFunc.ToString();
+            //    }
+            //}
+
+            //return fotoDesfocadaPath;
         }
             #endregion
             #endregion
