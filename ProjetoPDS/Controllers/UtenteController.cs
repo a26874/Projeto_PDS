@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using ProjetoPDS.Classes;
+using System.Drawing;
 
 namespace ProjetoPDS.Controllers
 {
@@ -53,20 +54,34 @@ namespace ProjetoPDS.Controllers
                 var existeUtente = baseDados.Utente.FirstOrDefault(u => u.Nome == utente.Nome);
                 if (existeUtente != null)
                 {
-                    encoding.UTENTEidUtente = existeUtente.idUtente;
-                    baseDados.Encoding.Add(encoding);
-                    await baseDados.SaveChangesAsync();
+                    try
+                    {
+                        encoding.UTENTEidUtente = existeUtente.idUtente;
+                        baseDados.Encoding.Add(encoding);
+                        await baseDados.SaveChangesAsync();
+                    }
+                    catch(Exception ex)
+                    {
+                        return StatusCode(500, "Ocorreu um erro ao processar o seu pedido. " + ex.Message);
+                    }
                 }
                 else
                 {
-                    baseDados.Utente.Add(utente);
-                    await baseDados.SaveChangesAsync();
-                    encoding.UTENTEidUtente = utente.idUtente;
-                    baseDados.Encoding.Add(encoding);
-                    await baseDados.SaveChangesAsync();
+                    try
+                    {
+                        baseDados.Utente.Add(utente);
+                        await baseDados.SaveChangesAsync();
+                        encoding.UTENTEidUtente = utente.idUtente;
+                        baseDados.Encoding.Add(encoding);
+                        await baseDados.SaveChangesAsync();
+                    }
+                    catch(Exception ex)
+                    {
+                        return StatusCode(500,"Ocorreu um erro ao processar o seu pedido. "+ ex.Message);
+                    }
                 }
             }
-            return Ok();
+            return Ok(string.Format("O utente com o nome:{0} foi inserido com sucesso.",nome));
         }
         /// <summary>
         /// Edita um utente.
@@ -85,7 +100,7 @@ namespace ProjetoPDS.Controllers
         {
             //Aqui fazemos um put. Recebemos do javascript uma lista de utentes verificados
             if (val == null || sala == null || aut == 0 || nome == null || utentesVerificados == null)
-                return BadRequest();
+                return BadRequest("Verifique os dados inseridos.");
 
             //Convertemos para uma lista de utentes verificados do C#
             List<UtenteIdentificado> listaExistentes = JsonConvert.DeserializeObject<List<UtenteIdentificado>>(utentesVerificados);
@@ -99,11 +114,74 @@ namespace ProjetoPDS.Controllers
                 existeUtente.Valencia = val;
                 existeUtente.Autorizacao = aut;
 
-                baseDados.Update(existeUtente);
-                await baseDados.SaveChangesAsync();
+                try
+                {
+                    baseDados.Update(existeUtente);
+                    await baseDados.SaveChangesAsync();
+
+                    return Ok(string.Format("Os dados do utilizador {0}",existeUtente.idUtente+ " foram alterados com sucesso."));
+                }
+                catch (Exception ex)
+                {
+                    return StatusCode(500, "Ocorreu um erro ao processar o seu pedido. "+ ex.Message);
+                }
             }
-            return Ok();
+            return NotFound(string.Format("O utente com o id: {0} não existe.",idUtente));
         }
 
+        [HttpGet]
+        [Route("ObterUtente/{idUtente}")]
+        public async Task<IActionResult> ObterUtente(int idUtente)
+        {
+            if (idUtente <= 0)
+                return BadRequest(string.Format("Id de utente invalido, ID: {0}.", idUtente));
+
+            try
+            {
+                var obterUtenteBd = baseDados.Utente.FirstOrDefault(u => u.idUtente == idUtente);
+                if (obterUtenteBd == null)
+                    return NotFound(string.Format("Não foi encontrado o utente com o ID:{0}",idUtente));
+
+                return Ok(obterUtenteBd);
+            }
+            catch(Exception ex)
+            {
+                return StatusCode(500, "Ocorreu um erro a processar o seu pedido. "+ ex.Message);
+            }
+        }
+        /// <summary>
+        /// Apaga um utente.
+        /// </summary>
+        /// <param name="idUtente"></param>
+        /// <returns></returns>
+
+        [HttpDelete]
+        [Route("ApagarUtente/{idUtente}")]
+        public async Task<IActionResult> ApagarUtente(int idUtente)
+        {
+            if(idUtente<= 0)
+                return BadRequest(string.Format("Id de utente invalido, ID: {0}.", idUtente));
+            try
+            {
+                var obterUtenteBd = baseDados.Utente.FirstOrDefault(u => u.idUtente == idUtente);
+
+                if (obterUtenteBd == null)
+                    return NotFound(string.Format("Não foi encontrado o utente com o ID: {0}", idUtente));
+
+                var obterEncodingUtente = baseDados.Encoding.Where(e => e.UTENTEidUtente == obterUtenteBd.idUtente);
+
+                
+                baseDados.Encoding.RemoveRange(obterEncodingUtente);
+                baseDados.Utente.Remove(obterUtenteBd);
+
+                await baseDados.SaveChangesAsync();
+
+                return Ok(string.Format("Foi apagado o utente com ID: {0} e os seus respetivos encodings.", obterUtenteBd.idUtente));
+            }
+            catch(Exception ex)
+            {
+                return StatusCode(500, "Ocorreu um erro ao processar o seu pedido. " + ex.Message);
+            }
+        }
     }
 }

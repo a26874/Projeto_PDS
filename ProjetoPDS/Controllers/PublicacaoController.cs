@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 using ProjetoPDS.Classes;
 
 namespace ProjetoPDS.Controllers
@@ -35,22 +37,29 @@ namespace ProjetoPDS.Controllers
         }
 
         /// <summary>
-        /// Recebe uma publicação e verifica a mesma.
+        /// Cria uma publicação e a sua foto correspondente.
         /// </summary>
-        /// <param name="pub"></param>
+        /// <param name="pubFoto"></param>
+        /// <param name="dataPub"></param>
+        /// <param name="idUtlz"></param>
+        /// <param name="Local"></param>
         /// <returns></returns>
         [HttpPost]
-        [Route("VerificarPublicacao")]
-        public async Task<IActionResult> VerificarPublicacao([FromForm] IFormFile pubFoto, [FromForm] string dataPub, [FromForm] int idUtlz, [FromForm] string Local)
+        [Route("AdicionarPublicacao")]
+        public async Task<IActionResult> AdicionarPublicacao([FromForm] IFormFile pubFoto, [FromForm] string dataPub, [FromForm] int idUtlz, [FromForm] string Local)
         {
             if (pubFoto == null || dataPub == null || idUtlz <= 0 || Local == null)
-                return BadRequest();
+                return BadRequest("Verifique os dados inseridos.");
             //Começamos por obter o nome do ficheiro, neste caso é o nome da imagem e o path onde ela vai ser guardada.
             Publicacao novaPublicacao = new Publicacao();
             Publicacao publicacaoExistente = new Publicacao();
             string nomeFicheiro = Path.GetFileName(pubFoto.FileName);
             string nomeDiretorio = Path.Combine(guardarFotoCaminho, nomeFicheiro);
+            string extensaoFicheiro = Path.GetExtension(pubFoto.FileName).ToLowerInvariant();
 
+            var extensoesImagem = new[] { ".jpg", ".jpeg", ".png" };
+            if (!extensoesImagem.Contains(extensaoFicheiro))
+                return BadRequest("Não foi dado upload de uma imagem.");
 
             if (!Path.Exists(nomeDiretorio))
                 using (var stream = new FileStream(nomeDiretorio, FileMode.Create))
@@ -86,7 +95,7 @@ namespace ProjetoPDS.Controllers
                     else if (Local == "Chat")
                         novaPublicacao.Local_Publicacaoid = LocalPublicacao.Chat + 1;
                     else
-                        return BadRequest();
+                        return BadRequest(string.Format("Não foi encontrado o local inserido {0}",Local));
                 }
                 try
                 {
@@ -224,6 +233,105 @@ namespace ProjetoPDS.Controllers
                 listaIdentificados = auxListaUtentesIdentificados,
             };
             return Ok(Json(fotoParaVerificar));
+        }
+
+        /// <summary>
+        /// Dado o id de uma publicação, é recebida informação da mesma.
+        /// </summary>
+        /// <param name="idPublicacao"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("ObterPublicacao/{idPublicacao}")]
+        public async Task<IActionResult> ObterPublicacao(int idPublicacao)
+        {
+            if (idPublicacao <= 0)
+                return BadRequest(string.Format("Id de publicação inválida, ID: {0}.", idPublicacao));
+
+            Publicacao obterPub = new Publicacao();
+             
+            try
+            {
+                var obterPubBd = baseDados.Publicacao.FirstOrDefault(p => p.Publicacao_id == idPublicacao);
+
+                if (obterPubBd == null)
+                    return NotFound(string.Format("Não foi encontrada a publicação de ID:{0}.",idPublicacao));
+
+                obterPub = obterPubBd;
+                return Ok(obterPub);
+            }
+            catch(Exception ex)
+            {
+                return StatusCode(500, "Ocorreu um erro ao processar o seu pedido. " + ex.Message);
+            }
+        }
+        /// <summary>
+        /// Metodo delete, dado um id de uma publicação existente, é apagada a foto ou fotos correspondentes e a publicação.
+        /// </summary>
+        /// <param name="idPublicacao"></param>
+        /// <returns></returns>
+        [HttpDelete]
+        [Route("ApagarPublicacao/{idPublicacao}")]
+        public async Task<IActionResult> ApagarPublicacao(int idPublicacao)
+        {
+            if (idPublicacao <= 0)
+                return BadRequest(string.Format("Id de publicação inválida, ID: {0}.", idPublicacao));
+            try
+            {
+                var obterPubBd = baseDados.Publicacao.FirstOrDefault(p => p.Publicacao_id == idPublicacao);
+
+                if (obterPubBd == null)
+                    return NotFound(string.Format("Não foi encontrada a publicação com o id inserido: {0}",idPublicacao));
+            
+                var obterFotosBd = baseDados.Foto.Where(f => f.PUBLICACAOPublicacao_id == obterPubBd.Publicacao_id).ToList();
+
+                baseDados.Foto.RemoveRange(obterFotosBd);
+                baseDados.Publicacao.Remove(obterPubBd);
+
+                await baseDados.SaveChangesAsync();
+
+                return Ok(string.Format("As fotos correspondentes à publicação de ID {0} foi apagada.",idPublicacao));
+            }
+            catch(Exception ex)
+            {
+                return StatusCode(500, "Ocorreu um erro ao processador o seu pedido. " + ex.Message);
+            }
+        }
+        [HttpPut]
+        [Route("EditarPublicacao/{idPublicacao}/{local}")]
+        public async Task<IActionResult> editarPublicacao(int idPublicacao, string local)
+        {
+            if (idPublicacao <= 0 || local=="") 
+                return BadRequest();
+
+            try
+            {
+                var obterPubBd = baseDados.Publicacao.FirstOrDefault(p => p.Publicacao_id == idPublicacao);
+                if (obterPubBd == null)
+                    return NotFound(string.Format("Não foi encontrada a publicação com o id inserido: {0}.", idPublicacao));
+                if(obterPubBd.Local_Publicacaoid.ToString() != local)
+                {
+                    if (local == "EncEdc")
+                        obterPubBd.Local_Publicacaoid = LocalPublicacao.EncEduc + 1;
+                    else if (local == "Sala")
+                        obterPubBd.Local_Publicacaoid = LocalPublicacao.Sala + 1;
+                    else if (local == "Mural")
+                        obterPubBd.Local_Publicacaoid = LocalPublicacao.Mural + 1;
+                    else if (local == "Chat")
+                        obterPubBd.Local_Publicacaoid = LocalPublicacao.Chat + 1;
+                    else
+                        return NotFound(string.Format("Não foi encontrado o local {0}.",local));
+
+                    baseDados.Publicacao.Update(obterPubBd);
+                    await baseDados.SaveChangesAsync();
+
+                    return Ok(string.Format("Alterações realizadas com sucesso. ID da Publicação: {0}", idPublicacao));
+                }
+            }
+            catch(Exception ex)
+            {
+                return StatusCode(500, "Ocorreu um erro ao processar o seu pedido. " + ex.Message);
+            }
+            return Ok();
         }
     }
 }

@@ -31,32 +31,86 @@ public class PublicacaoControllerTests
             return context.Encoding.ToList();
         }
     }
+    private List<Foto> ObterFotos()
+    {
+        var options = new DbContextOptionsBuilder<dataBase>()
+            .UseSqlServer("Server=MARCO\\MARCO;Database=photo_database;Trusted_Connection=True;TrustServerCertificate=True;")
+            .Options;
+        using (var context = new dataBase(options))
+            return context.Foto.ToList();
+    }
+
+    private List<Publicacao> ObterPublicacoes()
+    {
+        var options = new DbContextOptionsBuilder<dataBase>()
+            .UseSqlServer("Server=MARCO\\MARCO;Database=photo_database;Trusted_Connection=True;TrustServerCertificate=True;")
+            .Options;
+        using (var context = new dataBase(options))
+            return context.Publicacao.ToList();
+    }
     private void CriarMockup()
     {
         using (var context = new dataBase(_options))
         {
             // Add test data to the in-memory database for testing
             var utente = new Utente { idUtente = 1, Nome = "John Doe", Valencia = "Valencia1", Sala = "Sala1", Autorizacao = 1 };
-            context.Utente.Add(utente);
+
+            if (!context.Utente.Any(u => u.idUtente == utente.idUtente))
+            {
+                context.Utente.Add(utente);
+            }
 
             // Fetch and add encoding data from the actual database
             var encodingList = ObterEncodings();
-            context.Encoding.AddRange(encodingList);
+
+            foreach (var encoding in encodingList)
+            {
+                if (!context.Encoding.Any(e => e.idEncoding== encoding.idEncoding))
+                {
+                    context.Encoding.Add(encoding);
+                }
+            }
+
+            var publicacaoLista = ObterPublicacoes();
+
+            foreach (var publicacao in publicacaoLista)
+            {
+                if (!context.Publicacao.Any(p => p.Publicacao_id == publicacao.Publicacao_id))
+                {
+                    context.Publicacao.Add(publicacao);
+                }
+            }
+
+            var fotosLista = ObterFotos();
+
+            foreach (var foto in fotosLista)
+            {
+                if (!context.Foto.Any(f => f.Foto_id== foto.Foto_id))
+                {
+                    context.Foto.Add(foto);
+                }
+            }
 
             context.SaveChanges();
         }
     }
 
 
+
+    /// <summary>
+    /// Testes para adição de publicaçoes.
+    /// </summary>
+    /// <returns></returns>
     [TestMethod]
-    public async Task VerificarPublicacao_ValidData_ReturnsOkResult()
+    public async Task AdicionarPublicacao()
     {
         using (var context = new dataBase(_options))
         {
-            // Arrange
+            
             var controller = new PublicacaoController(context);
 
             var filePath = @"C:\Users\marco\source\repos\Projeto_PDS\ProjetoPDS\website\Imagens\Uploads_Publicacoes\image.png";
+            //var filePath = @"C:\Users\marco\Desktop\backupPDS\.gitattributes";
             var fileName = Path.GetFileName(filePath);
             var stream = new FileStream(filePath, FileMode.Open);
 
@@ -70,7 +124,31 @@ public class PublicacaoControllerTests
             int idUtlz = 1;
             string local = "Sala";
 
-            var result = await controller.VerificarPublicacao(pubFoto, dataPub, idUtlz, local) as OkObjectResult;
+            var result = await controller.AdicionarPublicacao(pubFoto, dataPub, idUtlz, local) as OkObjectResult;
+
+            Assert.IsNotNull(result);
+            Assert.AreEqual(200, result.StatusCode);
+        }
+    }
+    /// <summary>
+    /// Testes para remoção de publicações.
+    /// </summary>
+    /// <returns></returns>
+    [TestMethod]
+    public async Task ApagarPublicacao()
+    {
+        using (var context = new dataBase(_options))
+        {
+            var controller = new PublicacaoController(context);
+            Publicacao removePub = new Publicacao();
+
+            removePub.Local_Publicacaoid = LocalPublicacao.Sala;
+            removePub.DataPublicacao = DateTime.Now;
+            removePub.Publicacao_id = 1;
+            removePub.CaminhoFoto = @"C:\Users\marco\source\repos\Projeto_PDS\ProjetoPDS\website\Imagens\Uploads_Publicacoes\image.png";
+            removePub.IdUtilizador = 1;
+
+            var result = await controller.ApagarPublicacao(removePub.Publicacao_id) as OkObjectResult;
 
             Assert.IsNotNull(result);
             Assert.AreEqual(200, result.StatusCode);

@@ -21,7 +21,7 @@ document.getElementById('addPublicacao').addEventListener('submit', async functi
     formData.append('dataPub', dataPub);
     formData.append('Local',localPub)
     try {
-        const apiURLPhoto = 'https://localhost:7248/Publicacao/VerificarPublicacao';
+        const apiURLPhoto = 'https://localhost:7248/Publicacao/AdicionarPublicacao';
         const requestOptions = {
             method: 'POST',
             body: formData,

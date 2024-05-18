@@ -41,12 +41,10 @@ namespace ProjetoPDS.Controllers
                 else if (local == "Chat")
                     numbLocal = 4;
                 else
-                    return BadRequest();
+                    return BadRequest(string.Format("Não existe o local inserido: {0}",local));
             }
-            if (fotoOriginal == null)
-                return BadRequest();
-            if (nomeFotoFicheiro == null)
-                return BadRequest();
+            if (fotoOriginal == null || nomeFotoFicheiro == null)
+                return BadRequest("Caminho da foto original ou nome do ficheiro não existentes.");
             nomeFicheiros.Add(nomeFotoFicheiro);
 
             FotoComDesfoque novoDesfoque = new FotoComDesfoque();
