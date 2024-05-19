@@ -26,11 +26,13 @@ namespace ProjetoPDS.Classes
             modelBuilder.Entity<Utente>().HasKey(u => u.idUtente); 
             modelBuilder.Entity<Encoding>().HasKey(u => u.idEncoding);
             modelBuilder.Entity<Publicacao>().HasKey(u => u.Publicacao_id);
+            modelBuilder.Entity<Foto>().HasKey(u => u.Foto_id);
         }
 
 
         public DbSet<Utente> Utente { get; set; }
         public DbSet<Encoding> Encoding { get; set; }
         public DbSet<Publicacao> Publicacao { get; set; }
+        public DbSet<Foto> Foto { get; set; }
     }
 }

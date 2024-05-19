@@ -21,7 +21,7 @@ document.getElementById('addPublicacao').addEventListener('submit', async functi
     formData.append('dataPub', dataPub);
     formData.append('Local',localPub)
     try {
-        const apiURLPhoto = 'https://localhost:7248/Publicacao/VerificarPublicacao';
+        const apiURLPhoto = 'https://localhost:7248/Publicacao/AdicionarPublicacao';
         const requestOptions = {
             method: 'POST',
             body: formData,
@@ -309,7 +309,7 @@ document.getElementById('addPublicacao').addEventListener('submit', async functi
                         segundaCor = parseInt(rgbValues[1]);
                         terceiraCor = parseInt(rgbValues[2]); 
                     }
-                    await enviarDadosPessoa(auxPosX, auxPosY, nomeUtilizador, valenciaUtilizador, salaUtilizador,
+                    await enviarDadosPessoa( nomeUtilizador, valenciaUtilizador, salaUtilizador,
                         autUtilizador, fotoOriginal, nomeFotoFicheiro, utentesVerificar, primeiraCor, segundaCor,
                             terceiraCor);        
                 }
@@ -347,15 +347,15 @@ document.getElementById('addPublicacao').addEventListener('submit', async functi
 
 function getRelativePath(absolutePath)
 {
-  /*const projectPath = 'C:/Users/marco/source/repos/Projeto_PDS/ProjetoPDS/website/';
-    const relativePath = '../' + absolutePath.substring(projectPath.length);*/
+    /*const projectPath = 'C:/Users/marco/source/repos/Projeto_PDS/ProjetoPDS/website/';
+      const relativePath = '../' + absolutePath.substring(projectPath.length);*/
     const projectPath = 'C:/VisualStudioProjetos/Projeto_PDS/ProjetoPDS/website';
     const relativePath = '.' + absolutePath.substring(projectPath.length);
     const normalizedrelativePath = relativePath.replace(/\\/g, '/');
     return normalizedrelativePath;
 }
 
-async function enviarDadosPessoa(posX, posY, nome, valencia, sala, aut, nomeDiretorio, nomeFotoFicheiro,utentesVerificar, primeiraCor
+async function enviarDadosPessoa(nome, valencia, sala, aut, nomeDiretorio, nomeFotoFicheiro,utentesVerificar, primeiraCor
                                 , segundaCor, terceiraCor)
 {
     alert("Estou a enviar dados para adicionar a bd.");
@@ -367,14 +367,12 @@ async function enviarDadosPessoa(posX, posY, nome, valencia, sala, aut, nomeDire
         formDataPessoa.append('val',valencia);
         formDataPessoa.append('sala',sala);
         formDataPessoa.append('aut', aut);
-        formDataPessoa.append('posX', posX);
-        formDataPessoa.append('posY', posY);
         formDataPessoa.append('utentesPorVerificar', JSON.stringify(utentesVerificar));
         formDataPessoa.append('corP', primeiraCor)
         formDataPessoa.append('corS', segundaCor)
         formDataPessoa.append('corT', terceiraCor)
         
-        const apiURL = 'https://localhost:7248/Publicacao/RealizarRegisto';
+        const apiURL = 'https://localhost:7248/Utente/RealizarRegisto';
         const requestOptionsPessoa = {
             method:'POST',
             body: formDataPessoa,
@@ -405,7 +403,7 @@ async function editarDadosPessoa(idUtilizadorBd, nome, valencia, sala, aut, uten
         formDataEditPessoa.append('corP', primeiraCor)
         formDataEditPessoa.append('corS', segundaCor)
         formDataEditPessoa.append('corT', terceiraCor)
-        const apiURL = 'https://localhost:7248/Publicacao/EditarRegisto';
+        const apiURL = 'https://localhost:7248/Utente/EditarRegisto';
         const requestOptionsPessoa = {
             method:'PUT',
             body: formDataEditPessoa,
@@ -432,9 +430,10 @@ async function enviarDadosPessoaDesfoque(fotoOriginal, nomeFotoFicheiro, absolut
         const formDataDesfoquePessoa = new FormData();
         formDataDesfoquePessoa.append('fotoOriginal', fotoOriginal);
         formDataDesfoquePessoa.append('nomeFotoFicheiro', nomeFotoFicheiro);
-        formDataDesfoquePessoa.append('absolutePath', absolutePath);
+        const localPub = document.getElementById('localPostagem').value;
+        formDataDesfoquePessoa.append('local', localPub);
         formDataDesfoquePessoa.append('utentesPorVerificar', JSON.stringify(utentesVerificar))
-        const apiURL = 'https://localhost:7248/Publicacao/RealizarDesfoque';
+        const apiURL = 'https://localhost:7248/Desfoque/RealizarDesfoque';
         const requestOptions = {
             method:'POST',
             body: formDataDesfoquePessoa,

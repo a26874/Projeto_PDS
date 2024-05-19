@@ -42,6 +42,24 @@ namespace ProjetoPDS.Classes
         /// <summary>
         /// Construtor por parametros.
         /// </summary>
+        /// <param name="id"></param>
+        /// <param name="nome"></param>
+        /// <param name="valencia"></param>
+        /// <param name="sala"></param>
+        /// <param name="autorizacao"></param>
+        /// <param name="uploadFoto"></param>
+        public Utente(int id, string nome, string valencia, string sala, int autorizacao, IFormFile uploadFoto)
+        {
+            this.id = id;
+            this.nome = nome;
+            this.valencia = valencia;
+            this.sala = sala;
+            this.autorizacao = autorizacao;
+            this.uploadFoto = uploadFoto;
+        }
+        /// <summary>
+        /// Construtor por parametros.
+        /// </summary>
         /// <param name="nome"></param>
         /// <param name="valencia"></param>
         /// <param name="sala"></param>

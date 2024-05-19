@@ -24,12 +24,10 @@ namespace ProjetoPDS.Classes
         private int idUtlz;
         private DateTime dataPub;
         private LocalPublicacao local;
-        private List<FotoOrigem> listaFotosOrigem;
+        private List<Foto> listaFotosOrigem;
         [NotMapped]
         private IFormFile foto;
         private string? caminhoFoto;
-        //[NotMapped]
-        //private string dataResult;
         #endregion
 
         #region COMPORTAMENTO
@@ -43,23 +41,23 @@ namespace ProjetoPDS.Classes
 
         }
         /// <summary>
-        /// Construtor com parametros.
+        /// Construtor por parametros.
         /// </summary>
-        /// <param name="idPub"></param>
+        /// <param name="publicacao_id"></param>
         /// <param name="idUtlz"></param>
         /// <param name="dataPub"></param>
-        /// <param name="localPostagem"></param>
+        /// <param name="local"></param>
         /// <param name="listaFotosOrigem"></param>
-        /// <param name="fotoPub"></param>
+        /// <param name="foto"></param>
         /// <param name="caminhoFoto"></param>
-        public Publicacao(int idPub, int idUtlz, DateTime dataPub, LocalPublicacao localPostagem, List<FotoOrigem> listaFotosOrigem, IFormFile fotoPub, string caminhoFoto)
+        public Publicacao(int publicacao_id, int idUtlz, DateTime dataPub, LocalPublicacao local, List<Foto> listaFotosOrigem, IFormFile foto, string? caminhoFoto)
         {
-            publicacao_id= idPub;
-            this.idUtlz= idUtlz;
-            this.dataPub= dataPub;
-            local = localPostagem;
+            this.publicacao_id = publicacao_id;
+            this.idUtlz = idUtlz;
+            this.dataPub = dataPub;
+            this.local = local;
             this.listaFotosOrigem = listaFotosOrigem;
-            foto = fotoPub;
+            this.foto = foto;
             this.caminhoFoto = caminhoFoto;
         }
 

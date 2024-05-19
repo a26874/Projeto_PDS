@@ -15,7 +15,7 @@ namespace ProjetoPDS.Classes
     public class UtenteVerificar
     {
         #region ATRIBUTOS
-        private string nome;
+        private string nomeUtz;
         private int cordTop;
         private int cordBottom;
         private int cordRight;
@@ -37,11 +37,6 @@ namespace ProjetoPDS.Classes
         #endregion
 
         #region PROPRIEDADES
-        public string Nome
-        {
-            get { return nome; } 
-            set {  nome = value; }
-        }
         /// <summary>
         /// Obter cord top
         /// </summary>
@@ -106,12 +101,23 @@ namespace ProjetoPDS.Classes
             get { return terceiraCor; }
             set { terceiraCor = value; }
         }
-
+        /// <summary>
+        /// Obter o nivel de autorização.
+        /// </summary>
         public int Autorizacao
         {
             get { return autorizacao; }
-            set { autorizacao = value; }
+            set {  autorizacao = value; }
         }
+        /// <summary>
+        /// Obter o nome de utente
+        /// </summary>
+        public string Nome
+        {
+            get { return nomeUtz; }
+            set {  nomeUtz = value; }
+        }
+
         #endregion
 
         #region OPERADORES
