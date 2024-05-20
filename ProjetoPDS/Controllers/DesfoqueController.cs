@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using ProjetoPDS.Classes;
+using System.Drawing.Printing;
 
 namespace ProjetoPDS.Controllers
 {
@@ -48,11 +49,14 @@ namespace ProjetoPDS.Controllers
                 return BadRequest("Caminho da foto original ou nome do ficheiro não existentes.");
             FotoComDesfoque novoDesfoque = new FotoComDesfoque();
             List<UtenteVerificar> listaDesfoque = JsonConvert.DeserializeObject<List<UtenteVerificar>>(utentesPorVerificar);
+            listaDesfoque[0].Nome = "costa rica";
+            listaDesfoque[0].Autorizacao = 0;
             foreach (UtenteVerificar utente in listaDesfoque)
             {
                 if (utente.Autorizacao < numbLocal && utente.Nome != null)
                 {
-                    auxNomeFicheiro = nomeFotoFicheiro + "_" + utente.Nome;
+                    string nomeMinus = utente.Nome.Replace(" ", "-");
+                    auxNomeFicheiro = nomeFotoFicheiro + "_" + nomeMinus;
                     //checkar se existe na base de dados uma imagem ja com esse nome, para nao haver duplicatas, se tiver coloca um _2 tipo isto
                     pathFotoDesfocada = novoDesfoque.AplicarDesfoque(fotoOriginal, pathImages + "\\" + auxNomeFicheiro + ".png"/*auxNomeFicheiro*/, listaDesfoque, utente.Nome);
                     nomeFicheiros.Add(string.Copy(pathFotoDesfocada));
@@ -60,6 +64,7 @@ namespace ProjetoPDS.Controllers
             }
             pathFotoDesfocada = novoDesfoque.AplicarDesfoque(fotoOriginal, pathImages + "\\" + nomeFotoFicheiro + ".png", listaDesfoque, "a");
             nomeFicheiros.Add(string.Copy(pathFotoDesfocada));
+            
             return Ok(Json(nomeFicheiros));
         }
     }

@@ -336,6 +336,11 @@ document.getElementById('addPublicacao').addEventListener('submit', async functi
                 })
             bodyTag.appendChild(sendPessoaDesfoque)
             bodyTag.appendChild(sendCoordButtonAdd);
+            const Desfocagem = document.createElement('div');
+            Desfocagem.id = "Desfocagem";
+            Desfocagem.style.display = "flex";
+            Desfocagem.style.flexDirection = "column";
+            bodyTag.appendChild(Desfocagem);
             // bodyTag.appendChild(sendCoordButton);
             buttonCreated = true; 
         }
@@ -441,18 +446,28 @@ async function enviarDadosPessoaDesfoque(fotoOriginal, nomeFotoFicheiro, absolut
 
         const response = await fetch(apiURL, requestOptions);
         const data = await response.json();
-        
-        const fotoDesfocada = document.getElementById('fotoDesfocada');
-        fotoDesfocada.src = data.value.pathFotoDesfocada
-        // for(let i = 0; i < 4 ; i++)
-        //     {
-        //         const newBreak = document.createElement('br')
-        //         bodyTag.appendChild(newBreak);
-        //     }
-        // const novaImagem = document.createElement('img');
-        // novaImagem.src = data.value.pathFotoDesfocada
-        // bodyTag.appendChild(novaImagem)
-        console.log(data)
+        const nomeFicheiros = data.value;
+        div = document.getElementById("Desfocagem");
+        //se a div estiver vazia remove tudo de dentro
+        if(div.firstChild !== null){
+            while (div.firstChild) {
+                div.removeChild(div.firstChild);
+            }
+        }
+        nomeFicheiros.forEach(ficheiro => {
+            const img = document.createElement('img');
+            const fileName = ficheiro.split('/').pop();
+            const fileNameWithoutExtension = fileName.split('.').slice(0, -1).join('.'); // "imagem_costa"
+            const UtenteNome = fileNameWithoutExtension.split('_').pop(); // "costa"
+            const nome = document.createElement('h1');
+            nome.innerHTML = UtenteNome;
+            div.appendChild(nome)
+            ficheiro = getRelativePath(ficheiro)
+            img.src = ficheiro;
+            img.alt = "Imagem desfocada"; 
+            img.classList.add("desfocada");
+            div.appendChild(img);
+        });
     }
     catch (error){
         console.error(error);
