@@ -248,7 +248,7 @@ namespace ProjetoPDS.Controllers
                 fotoOriginal = nomeDiretorio,
                 diretorioFoto = nomeDiretorioAux,
                 listaIdentificados = auxListaUtentesIdentificados,
-            };
+            }; 
             return Ok(Json(fotoParaVerificar));
         }
 
