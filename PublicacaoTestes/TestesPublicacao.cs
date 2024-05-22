@@ -12,12 +12,10 @@ public class PublicacaoControllerTests
     [TestInitialize]
     public void Setup()
     {
-        // Set up DbContextOptions for in-memory database
         _options = new DbContextOptionsBuilder<dataBase>()
             .UseInMemoryDatabase(databaseName: "TestDatabase")
             .Options;
 
-        // Seed the in-memory database with test data if needed
         CriarMockup();
     }
 
@@ -52,7 +50,6 @@ public class PublicacaoControllerTests
     {
         using (var context = new dataBase(_options))
         {
-            // Add test data to the in-memory database for testing
             var utente = new Utente { idUtente = 1, Nome = "John Doe", Valencia = "Valencia1", Sala = "Sala1", Autorizacao = 1 };
 
             if (!context.Utente.Any(u => u.idUtente == utente.idUtente))
@@ -60,7 +57,6 @@ public class PublicacaoControllerTests
                 context.Utente.Add(utente);
             }
 
-            // Fetch and add encoding data from the actual database
             var encodingList = ObterEncodings();
 
             foreach (var encoding in encodingList)

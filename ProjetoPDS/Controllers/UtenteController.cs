@@ -92,6 +92,7 @@ namespace ProjetoPDS.Controllers
         /// <param name="aut"></param>
         /// <param name="utentesVerificados"></param>
         /// <returns></returns>
+        
         [HttpPut]
         [Route("EditarRegisto")]
 
@@ -182,6 +183,23 @@ namespace ProjetoPDS.Controllers
             {
                 return StatusCode(500, "Ocorreu um erro ao processar o seu pedido. " + ex.Message);
             }
+        }
+        [HttpPost]
+        [Route("AdicionarUtenteAux")]
+        public async Task<IActionResult> AdicionarUtenteAux(Utente utente)
+        {
+            var existeUtente = baseDados.Utente.FirstOrDefault(u => u.Nome == utente.Nome);
+            if (existeUtente != null)
+            try
+            {
+                baseDados.Utente.Add(utente);
+                await baseDados.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Ocorreu um erro ao processar o seu pedido. " + ex.Message);
+            }
+            return Ok("Utente adicionado com sucesso.");
         }
     }
 }

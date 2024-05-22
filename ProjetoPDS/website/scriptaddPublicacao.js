@@ -53,6 +53,12 @@ document.getElementById('addPublicacao').addEventListener('submit', async functi
             const headerTabelaDadosIdentificados = document.createElement('tr');
             tabelaDadosIdentificados.append(headerTabelaDadosIdentificados);
             //Criação de headers.
+
+            const headerDadosMiniaturaIdentificados = document.createElement('th');
+            headerDadosMiniaturaIdentificados.innerHTML = "Foto";
+            headerDadosMiniaturaIdentificados.style.border = "1px solid black";
+            headerTabelaDadosIdentificados.append(headerDadosMiniaturaIdentificados);
+
             const headerDadosNomeIdentificados = document.createElement('th');
             headerDadosNomeIdentificados.innerHTML = "Nome";
             headerDadosNomeIdentificados.style.border = "1px solid black";
@@ -90,6 +96,15 @@ document.getElementById('addPublicacao').addEventListener('submit', async functi
                     const linha = document.createElement('tr');
                     linha.setAttribute('id', 'linhaNum' + (i + 1));
                     tabelaDadosIdentificados.append(linha);
+
+                    //Cria célula para nova imagem
+                    const imagemTd = document.createElement('td');
+                    linha.append(imagemTd);
+                    const miniaturaUtilizador = document.createElement('img');
+                    miniaturaUtilizador.setAttribute('id', 'miniaturaUtilizadorIdentificado'+ (i+1));
+                    if(utentesVerificados[i].fotoMiniatura != null && i < utentesVerificados.length)
+                            miniaturaUtilizador.src = getRelativePathMiniature(utentesVerificados[i].fotoMiniatura);
+                    imagemTd.append(miniaturaUtilizador);
 
                     // Cria célula para nome de utilizador
                     const nomeTd = document.createElement('td');
@@ -198,6 +213,12 @@ document.getElementById('addPublicacao').addEventListener('submit', async functi
             const headerTabelaDadosNaoIdentificados = document.createElement('tr');
             tabelaDadosNaoIdentificados.append(headerTabelaDadosNaoIdentificados);
             //Criação de headers.
+
+            const headerDadosMiniaturaNaoIdentificados = document.createElement('th');
+            headerDadosMiniaturaNaoIdentificados.innerHTML = "Foto";
+            headerDadosMiniaturaNaoIdentificados.style.border = "1px solid black";
+            headerTabelaDadosNaoIdentificados.append(headerDadosMiniaturaNaoIdentificados)
+
             const headerDadosNomeNaoIdentificados = document.createElement('th');
             headerDadosNomeNaoIdentificados.innerHTML = "Nome";
             headerDadosNomeNaoIdentificados.style.border = "1px solid black";
@@ -230,6 +251,16 @@ document.getElementById('addPublicacao').addEventListener('submit', async functi
                     const linha = document.createElement('tr');
                     linha.setAttribute('id', 'linhaNum' + (i + 1));
                     tabelaDadosNaoIdentificados.append(linha);
+
+
+                    //Cria célula para a imagem do utilizador
+                    const imagemTd = document.createElement('td');
+                    linha.append(imagemTd);
+                    const miniaturaUtilizador = document.createElement('img');
+                    miniaturaUtilizador.setAttribute('id', 'miniaturaUtilizadorNaoIdentificado'+ (i+1));
+                    if(utentesVerificar[i].fotoMiniatura != null && i < utentesVerificar.length)
+                            miniaturaUtilizador.src = getRelativePathMiniature(utentesVerificar[i].fotoMiniatura);
+                    imagemTd.append(miniaturaUtilizador);
 
                     // Cria célula para nome de utilizador
                     const nomeTd = document.createElement('td');
@@ -352,10 +383,18 @@ document.getElementById('addPublicacao').addEventListener('submit', async functi
 
 function getRelativePath(absolutePath)
 {
-    /*const projectPath = 'C:/Users/marco/source/repos/Projeto_PDS/ProjetoPDS/website/';
-      const relativePath = '../' + absolutePath.substring(projectPath.length);*/
-    const projectPath = 'C:/VisualStudioProjetos/Projeto_PDS/ProjetoPDS/website';
-    const relativePath = '.' + absolutePath.substring(projectPath.length);
+    const projectPath = 'C:/Users/marco/source/repos/Projeto_PDS/ProjetoPDS/website/';
+    const relativePath = '../' + absolutePath.substring(projectPath.length);
+    // const projectPath = 'C:/VisualStudioProjetos/Projeto_PDS/ProjetoPDS/website';
+    // const relativePath = '.' + absolutePath.substring(projectPath.length);
+    const normalizedrelativePath = relativePath.replace(/\\/g, '/');
+    return normalizedrelativePath;
+}
+
+function getRelativePathMiniature(absolutePath)
+{
+    const projectPath = 'C:/Users/marco/source/repos/Projeto_PDS/ProjetoPDS/website/';
+    const relativePath = '../' + absolutePath.substring(projectPath.length);
     const normalizedrelativePath = relativePath.replace(/\\/g, '/');
     return normalizedrelativePath;
 }

@@ -56,6 +56,7 @@ namespace ProjetoPDS.Controllers
             string nomeFicheiro = Path.GetFileName(pubFoto.FileName);
             string nomeDiretorio = Path.Combine(guardarFotoCaminho, nomeFicheiro);
             string extensaoFicheiro = Path.GetExtension(pubFoto.FileName).ToLowerInvariant();
+            int auxUtenteId = 0;
 
             var extensoesImagem = new[] { ".jpg", ".jpeg", ".png" };
             if (!extensoesImagem.Contains(extensaoFicheiro))
@@ -193,16 +194,32 @@ namespace ProjetoPDS.Controllers
             string nomeFicheiroAux = "";
             //Caso a lista tenha algum utente, faz o metodo de MostrarIdentificados.
             if (utentesIdentificados.Count > 0)
+            {
                 nomeDiretorioAux = novoReconhecimento.MostrarIdentificados(nomeFicheiro, nomeDiretorio, auxListaUtentesIdentificados, out nomeFicheiroAux);
+                foreach(UtenteIdentificado u in utentesIdentificados)
+                {
+                    if (u != null)
+                        u.FotoMiniatura = novoReconhecimento.ObterFotoMiniatura(nomeFicheiro, nomeDiretorio, u.Left, u.Top, u.Right, u.Bottom, auxUtenteId);
+                    auxUtenteId++;
+                }
+            }
             //Caso a lista tenha algum utente por verificar, faz o metodo de MostrarNãoIdentificados.
             if (utentesPorVerificar.Count > 0)
+            {
                 if (nomeFicheiroAux != "")
                     nomeDiretorioAux = novoReconhecimento.MostrarNaoIdentificados(nomeFicheiroAux, nomeDiretorioAux, utentesPorVerificar);
                 else
                     nomeDiretorioAux = novoReconhecimento.MostrarNaoIdentificados(nomeFicheiro, nomeDiretorio, utentesPorVerificar);
+
+                foreach(UtenteVerificar u in utentesPorVerificar)
+                {
+                    if (u != null)
+                        u.FotoMiniatura = novoReconhecimento.ObterFotoMiniatura(nomeFicheiro, nomeDiretorio, u.Left, u.Top, u.Right, u.Bottom, auxUtenteId);
+                    auxUtenteId++;
+                }
+            }
             
             Foto novaFoto = new Foto();
-            //var existePublicacao = baseDados.Publicacao.FirstOrDefault(a => a.CaminhoFoto == nomeDiretorio);
 
             var existeFoto = baseDados.Foto.FirstOrDefault(a => a.url == nomeDiretorio);
             if(existeFoto == null)

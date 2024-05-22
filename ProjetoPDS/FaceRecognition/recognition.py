@@ -37,6 +37,26 @@ def compareEncoding(encoding1, encoding2):
     except IndexError:
         print('Erro.')
 
+
+        
+def small_image_face(fileName, pathToFile, left, top, right, bottom, utenteId):
+    image = cv2.imread(pathToFile)
+    if left > 0 and top > 0 and right > 0 and bottom > 0:
+        face_image = image[top:bottom, left:right]
+        try:
+            currentDirectory = os.getcwd()
+            folderName = "Fotos_Miniatura"
+            newDirectory = os.path.join(currentDirectory, "website", "Imagens",folderName)
+            if not os.path.exists(newDirectory):
+                os.makedirs(newDirectory)
+            auxUtenteId = str(utenteId)
+            folderNameMin = "Fotos_Miniatura_"+fileName+auxUtenteId
+            newFaceImageBlurred = os.path.join(newDirectory, folderNameMin + ".jpg")
+            cv2.imwrite(newFaceImageBlurred, face_image)
+            return newFaceImageBlurred
+        except IndexError:
+            print('Erro.')
+
 def censure_results_utente(fileName, pathToFile, left, top, right, bottom):
     image = cv2.imread(pathToFile)
     if left > 0 and top > 0 and right > 0 and bottom > 0:
@@ -88,7 +108,7 @@ def censure_results_non_identified(fileName, pathToFile, firstColor, secondColor
     except IndexError:
         print('teste')    
     
-    
+
 
 def censure_bool(image,face_loc_enc,border = True):
     """

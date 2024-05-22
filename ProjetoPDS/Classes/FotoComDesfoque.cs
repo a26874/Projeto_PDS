@@ -39,16 +39,15 @@ namespace ProjetoPDS.Classes
         /// </summary>
         static FotoComDesfoque()
         {
-            //Runtime.PythonDLL = "C:\\Users\\marco\\AppData\\Local\\Programs\\Python\\Python311\\python311.dll";
-            Runtime.PythonDLL = "C:/Users/user/AppData/Local/Programs/Python/Python311/python311.dll";
+            //Aqui é definido a localização do DLL de python.
+            Runtime.PythonDLL = "C:\\Users\\marco\\AppData\\Local\\Programs\\Python\\Python311\\python311.dll";
             //Não me lembro disto, mas para ter uma variavel igual a outra deve ser useless.
             PythonEngine.PythonPath = PythonEngine.PythonPath;
             //Inicializa o python
             PythonEngine.Initialize();
             //Isto é feito para dizer onde está o ficheiro de python, neste caso é o recognition (aqui é apenas a pasta).
             dynamic sys = Py.Import("sys");
-            //sys.path.append(@"C:\Users\marco\source\repos\Projeto_PDS\ProjetoPDS\FaceRecognition");
-            sys.path.append("C:/VisualStudioProjetos/Projeto_PDS/ProjetoPDS/FaceRecognition/");
+            sys.path.append(@"C:\Users\marco\source\repos\Projeto_PDS\ProjetoPDS\FaceRecognition");
         }
         /// <summary>
         /// Construtor por defeito.
@@ -338,6 +337,23 @@ namespace ProjetoPDS.Classes
             //}
 
             //return fotoDesfocadaPath;
+        }
+        public string ObterFotoMiniatura(string nomeFicheiro, string nomeDiretorio, int left, int top, int right, int bottom, int auxUtenteId)
+        {
+            string fotoMiniaturaPath = "";
+            string auxNomeFicheiro = Path.GetFileNameWithoutExtension(nomeFicheiro);
+
+
+            dynamic facilRecMod = Py.Import("recognition");
+            dynamic loadEncFunc = facilRecMod.small_image_face;
+
+            dynamic execFunc = loadEncFunc(auxNomeFicheiro, nomeDiretorio, left, top, right, bottom, auxUtenteId);
+
+            fotoMiniaturaPath = execFunc.ToString();
+
+            return fotoMiniaturaPath;
+
+
         }
             #endregion
             #endregion

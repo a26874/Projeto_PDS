@@ -24,6 +24,7 @@ namespace ProjetoPDS.Classes
         private int segundaCor;
         private int terceiraCor;
         private int autorizacao;
+        private string fotoMiniatura;
         private Encoding encoding;
         #endregion
 
@@ -117,7 +118,14 @@ namespace ProjetoPDS.Classes
             get { return nomeUtz; }
             set {  nomeUtz = value; }
         }
-
+        /// <summary>
+        /// Obter a miniatura da fotografia processada.
+        /// </summary>
+        public string FotoMiniatura
+        {
+            get { return fotoMiniatura; }
+            set { fotoMiniatura = value; }
+        }
         #endregion
 
         #region OPERADORES

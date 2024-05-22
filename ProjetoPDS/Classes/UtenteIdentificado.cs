@@ -30,6 +30,7 @@ namespace ProjetoPDS.Classes
         private string valencia;
         private string sala;
         private int autorizacao;
+        private string fotoMiniatura;
         private Encoding encoding;
         #endregion
 
@@ -43,7 +44,7 @@ namespace ProjetoPDS.Classes
         {
 
         }
-        public UtenteIdentificado(int id, string nome, int cordTop, int cordBottom, int cordRight, int cordLeft, Encoding encoding, int top, int bottom, int right, int left)
+        public UtenteIdentificado(int id, string nome, int cordTop, int cordBottom, int cordRight, int cordLeft, Encoding encoding, int top, int bottom, int right, int left, string fotoMiniatura)
         {
             this.nome = nome;
             this.cordTop = cordTop;
@@ -51,6 +52,7 @@ namespace ProjetoPDS.Classes
             this.cordRight = cordRight;
             this.cordLeft = cordLeft;
             this.encoding = encoding;
+            this.fotoMiniatura = fotoMiniatura;
         }
 
         #endregion
@@ -160,6 +162,14 @@ namespace ProjetoPDS.Classes
         {
             get { return autorizacao; }
             set { autorizacao = value; }
+        }
+        /// <summary>
+        /// Obter a foto miniatura.
+        /// </summary>
+        public string FotoMiniatura
+        {
+            get { return fotoMiniatura;}
+            set { fotoMiniatura = value;}
         }
         #endregion
 

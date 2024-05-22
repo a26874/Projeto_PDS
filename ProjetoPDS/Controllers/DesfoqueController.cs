@@ -26,7 +26,7 @@ namespace ProjetoPDS.Controllers
         {
             int numbLocal = 0;
             List<string> nomeFicheiros;
-            string pathImages = "C:\\VisualStudioProjetos\\Projeto_PDS\\ProjetoPDS\\website\\Imagens\\Fotos_Desfocadas";
+            string pathImages = "C:\\Users\\marco\\source\\repos\\Projeto_PDS\\ProjetoPDS\\website\\Imagens\\Fotos_Desfocadas";
             nomeFotoFicheiro = Path.GetFileNameWithoutExtension(nomeFotoFicheiro);
             string pathFotoDesfocada;
             string auxNomeFicheiro;

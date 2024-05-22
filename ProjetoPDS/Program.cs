@@ -1,7 +1,5 @@
-using ProjetoPDS.Classes;
-using Microsoft.EntityFrameworkCore.SqlServer;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Cors;
+using ProjetoPDS.Classes;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -15,6 +13,10 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 //Para conseguir enviar dados.
 app.UseCors(builder => builder
