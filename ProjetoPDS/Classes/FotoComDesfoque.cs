@@ -10,8 +10,16 @@
 using Newtonsoft.Json;
 using Python.Runtime;
 using System.ComponentModel.DataAnnotations;
-using System.Drawing.Imaging;
-
+using System;
+using System.Collections.Generic;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Text;
+using System.Threading.Tasks;
+using ProjetoPDS.Controllers;
+using Microsoft.AspNetCore.Mvc.ActionConstraints;
+using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel;
 
 namespace ProjetoPDS.Classes
 {
@@ -29,6 +37,7 @@ namespace ProjetoPDS.Classes
         private int numUtentes;
         private int numUtentesProcessados;
         private StatusFoto estadoFoto;
+        private readonly PythonController pyController = new PythonController();
         #endregion
 
         #region COMPORTAMENTO
@@ -127,11 +136,12 @@ namespace ProjetoPDS.Classes
         /// <returns></returns>
         public List<UtenteIdentificado> IdentificarUtentes(string pathToFile)
         {
+
             //Como lá em cima o folder do script de python foi definido para uma certa pasta, aqui só é necessário dar append do que
             //está lá, neste caso o ficheiro em si.
             dynamic facilRecMod = Py.Import("recognition");
             //É dado load do método que está no ficheiro, neste caso "recognition"
-            dynamic loadEncFunc = facilRecMod.recognition;
+            dynamic loadEncFunc = facilRecMod.recognitionUsers;
 
             //Aqui recebe o encoding que é retornado do resultado da função, tanto nesta função como em todas as outras que usam encodings
             //É recebida a lista de encodings, que no ficheiro python esse encoding é convertido para binário e de seguida para uma string
@@ -304,40 +314,44 @@ namespace ProjetoPDS.Classes
         /// </summary>
         /// <param name="fotoOriginal"></param>
         /// <param name="nomeFotoFicheiro"></param>
-        /// <param name="absolutePath"></param>
         /// <param name="listaUtentes"></param>
         /// <returns></returns>
-        public string AplicarDesfoque(string fotoOriginal, string nomeFotoFicheiro, List<UtenteVerificar> listaUtentes, string nomeAutorizacao)
+        public async Task<string> AplicarDesfoque(string fotoOriginal, string nomeFotoFicheiro, List<UtenteVerificar> listaUtentes/*, string nomeAutorizacao*/)
         {
-            System.Drawing.Image original = System.Drawing.Image.FromFile(fotoOriginal);
-            string fotoDesfocadaPath = nomeFotoFicheiro;
-            original.Save(fotoDesfocadaPath, ImageFormat.Png);
+            string auxNomeFotoFicheiro = Path.GetFileNameWithoutExtension(nomeFotoFicheiro);
+            bool firstIteration = true;
+            string fotoDesfocadaPath = "";
+            foreach(UtenteVerificar u in listaUtentes)
+            {
+                if(firstIteration)
+                {
+                    string response = await pyController.CallPythonBlur(fotoOriginal, auxNomeFotoFicheiro, u.Left, u.Top,u.Right,u.Bottom); 
+                    response = response.Trim('"');
+                    fotoDesfocadaPath = response.Replace(@"\\", @"\");
+                    firstIteration = false;
+                }
+                else
+                {
+                    string response = await pyController.CallPythonBlur(fotoDesfocadaPath, auxNomeFotoFicheiro, u.Left, u.Top, u.Right, u.Bottom);
+                    response = response.Trim('"');
+                    fotoDesfocadaPath = response.Replace(@"\\", @"\");
+                    firstIteration = false;
+                }
 
+            }
             return fotoDesfocadaPath;
-            //Esta função vai ser a próxima a ser reescrita. Basicamente inicialmente ela apenas conforme a posição clicada na imagem no site
-            //Iria ver se estava dentro dos limites da cara no python e dar blur caso estivesse dentro da posição da cara.
-            //dynamic facilRecMod = Py.Import("recognition");
-            //dynamic loadEncFunc = facilRecMod.censure_results_utente;
-            //string fotoDesfocadaPath = "";
-            //string auxNomeFicheiro = Path.GetFileNameWithoutExtension(nomeFotoFicheiro);
-            //bool firstIteration = true;
-            //foreach (UtenteVerificar u in listaUtentes)
-            //{
-            //    if (firstIteration)
-            //    {
-            //        dynamic execFunc = loadEncFunc(auxNomeFicheiro, fotoOriginal, u.Left, u.Top, u.Right, u.Bottom);
-            //        fotoDesfocadaPath = execFunc.ToString();
-            //        firstIteration = false;
-            //    }
-            //    else
-            //    {
-            //        dynamic execFunc = loadEncFunc(auxNomeFicheiro, fotoDesfocadaPath, u.Left, u.Top, u.Right, u.Bottom);
-            //        fotoDesfocadaPath = execFunc.ToString();
-            //    }
-            //}
-
-            //return fotoDesfocadaPath;
         }
+        /// <summary>
+        /// Cria uma foto miniatura para cada uma das pessoas processadas.
+        /// </summary>
+        /// <param name="nomeFicheiro"></param>
+        /// <param name="nomeDiretorio"></param>
+        /// <param name="left"></param>
+        /// <param name="top"></param>
+        /// <param name="right"></param>
+        /// <param name="bottom"></param>
+        /// <param name="auxUtenteId"></param>
+        /// <returns></returns>
         public string ObterFotoMiniatura(string nomeFicheiro, string nomeDiretorio, int left, int top, int right, int bottom, int auxUtenteId)
         {
             string fotoMiniaturaPath = "";
@@ -400,7 +414,13 @@ namespace ProjetoPDS.Classes
             return novoListaUtentes;
         }
 
-
+        /// <summary>
+        /// Função para dar shutdown no python
+        /// </summary>
+        public void ShutdownPython()
+        {
+            PythonEngine.Shutdown();
+        }
         //Criei um deconstrutor, para tentar corrigir aquele erro acima do py.gil, mas penso que isto não faz diferença
         ~FotoComDesfoque()
         {

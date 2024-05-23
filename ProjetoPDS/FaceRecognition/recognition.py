@@ -6,7 +6,7 @@ import base64
 import numpy as np
 import os
 
-def recognition(pathToFile):
+def recognitionUsers(pathToFile):
     encodingList = {}
     try:
         image_face = face_recognition.load_image_file(pathToFile)
@@ -37,8 +37,6 @@ def compareEncoding(encoding1, encoding2):
     except IndexError:
         print('Erro.')
 
-
-        
 def small_image_face(fileName, pathToFile, left, top, right, bottom, utenteId):
     image = cv2.imread(pathToFile)
     if left > 0 and top > 0 and right > 0 and bottom > 0:
@@ -64,7 +62,7 @@ def censure_results_utente(fileName, pathToFile, left, top, right, bottom):
         face_image = cv2.GaussianBlur(face_image,(99,99),30)
         image[top:bottom, left:right] = face_image
         try:
-            currentDirectory = os.getcwd()
+            currentDirectory = "C:\\Users\\marco\\source\\repos\\Projeto_PDS\\ProjetoPDS\\website"
             folderName = "Fotos_Desfocadas"
             newDirectory = os.path.join(currentDirectory,"Imagens","Fotos_Desfocadas")
             if not os.path.exists(newDirectory):

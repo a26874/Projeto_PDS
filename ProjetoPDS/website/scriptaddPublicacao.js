@@ -363,7 +363,7 @@ document.getElementById('addPublicacao').addEventListener('submit', async functi
                             auxListaDesfocar.push(utentesVerificar[i])
                         }
                     }
-                        await enviarDadosPessoaDesfoque(fotoOriginal, nomeFotoFicheiro, absolutePath, auxListaDesfocar);       
+                        await enviarDadosPessoaDesfoque(fotoOriginal, nomeFotoFicheiro, auxListaDesfocar);       
                 })
             bodyTag.appendChild(sendPessoaDesfoque)
             bodyTag.appendChild(sendCoordButtonAdd);
@@ -463,7 +463,7 @@ async function editarDadosPessoa(idUtilizadorBd, nome, valencia, sala, aut, uten
     }       
 }
 
-async function enviarDadosPessoaDesfoque(fotoOriginal, nomeFotoFicheiro, absolutePath, utentesVerificar)
+async function enviarDadosPessoaDesfoque(fotoOriginal, nomeFotoFicheiro, utentesVerificar)
 {
     // esVerificar[i].bottom;
     //                             await enviarDadosPessoaDesfoque(fotoOriginal, nomeFotoFicheiro, absolutePath, faceLeft,faceTop,faceRight
@@ -486,6 +486,7 @@ async function enviarDadosPessoaDesfoque(fotoOriginal, nomeFotoFicheiro, absolut
         const response = await fetch(apiURL, requestOptions);
         const data = await response.json();
         const nomeFicheiros = data.value;
+        const fotoDesfocada = data.pathFotoDesfocada;
         div = document.getElementById("Desfocagem");
         //se a div estiver vazia remove tudo de dentro
         if(div.firstChild !== null){
@@ -493,20 +494,24 @@ async function enviarDadosPessoaDesfoque(fotoOriginal, nomeFotoFicheiro, absolut
                 div.removeChild(div.firstChild);
             }
         }
-        nomeFicheiros.forEach(ficheiro => {
-            const img = document.createElement('img');
-            const fileName = ficheiro.split('/').pop();
-            const fileNameWithoutExtension = fileName.split('.').slice(0, -1).join('.'); // "imagem_costa"
-            const UtenteNome = fileNameWithoutExtension.split('_').pop(); // "costa"
-            const nome = document.createElement('h1');
-            nome.innerHTML = UtenteNome;
-            div.appendChild(nome)
-            ficheiro = getRelativePath(ficheiro)
-            img.src = ficheiro;
-            img.alt = "Imagem desfocada"; 
-            img.classList.add("desfocada");
-            div.appendChild(img);
-        });
+        const imgDesfocada = document.createElement('img');
+        auxFotoDesfocada = getRelativePath(fotoDesfocada)
+        imgDesfocada.src = auxFotoDesfocada;
+        div.appendChild(imgDesfocada)
+        // nomeFicheiros.forEach(ficheiro => {
+        //     const img = document.createElement('img');
+        //     const fileName = ficheiro.split('/').pop();
+        //     const fileNameWithoutExtension = fileName.split('.').slice(0, -1).join('.'); // "imagem_costa"
+        //     const UtenteNome = fileNameWithoutExtension.split('_').pop(); // "costa"
+        //     const nome = document.createElement('h1');
+        //     nome.innerHTML = UtenteNome;
+        //     div.appendChild(nome)
+        //     ficheiro = getRelativePath(ficheiro)
+        //     img.src = ficheiro;
+        //     img.alt = "Imagem desfocada"; 
+        //     img.classList.add("desfocada");
+        //     div.appendChild(img);
+        // });
     }
     catch (error){
         console.error(error);
