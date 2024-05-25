@@ -7,7 +7,6 @@
 *	<description></description>
 **/
 
-using Python.Runtime;
 using System.ComponentModel.DataAnnotations;
 
 namespace ProjetoPDS.Classes
