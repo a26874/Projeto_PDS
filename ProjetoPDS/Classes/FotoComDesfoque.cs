@@ -8,18 +8,9 @@
 **/
 
 using Newtonsoft.Json;
+using ProjetoPDS.Controllers;
 using Python.Runtime;
 using System.ComponentModel.DataAnnotations;
-using System;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Text;
-using System.Threading.Tasks;
-using ProjetoPDS.Controllers;
-using Microsoft.AspNetCore.Mvc.ActionConstraints;
-using Microsoft.AspNetCore.Mvc;
-using System.ComponentModel;
 
 namespace ProjetoPDS.Classes
 {
@@ -414,6 +405,32 @@ namespace ProjetoPDS.Classes
             return novoListaUtentes;
         }
 
+        /// <summary>
+        /// Função para definir quais os utilizadores que necessitam de ser desfocados.
+        /// </summary>
+        /// <param name="utentesVerificar"></param>
+        /// <returns></returns>
+        public List<UtenteVerificar> VerificarAutorizacao(List<UtenteVerificar> utentesVerificar)
+        {
+            List<UtenteVerificar> utentesVerificarAux = new List<UtenteVerificar>();
+
+            foreach (UtenteVerificar u in utentesVerificar)
+                if (u.Autorizacao < 3)
+                    utentesVerificarAux.Add(u);
+
+            return utentesVerificarAux;
+        }
+
+        public List<UtenteIdentificado> VerificarAutorizacaoVerificados(List<UtenteIdentificado> utentesVerificados)
+        {
+            List<UtenteIdentificado> utentesVerificadosAux = new List<UtenteIdentificado>();
+
+            foreach (UtenteIdentificado u in utentesVerificados)
+                if (u.Autorizacao < 3)
+                    utentesVerificadosAux.Add(u);
+
+            return utentesVerificadosAux;
+        }
         /// <summary>
         /// Função para dar shutdown no python
         /// </summary>

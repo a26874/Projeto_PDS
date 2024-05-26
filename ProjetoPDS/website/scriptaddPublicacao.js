@@ -363,7 +363,7 @@ document.getElementById('addPublicacao').addEventListener('submit', async functi
                             auxListaDesfocar.push(utentesVerificar[i])
                         }
                     }
-                        await enviarDadosPessoaDesfoque(fotoOriginal, nomeFotoFicheiro, auxListaDesfocar);       
+                        await enviarDadosPessoaDesfoque(fotoOriginal, nomeFotoFicheiro, auxListaDesfocar, utentesVerificados);       
                 })
             bodyTag.appendChild(sendPessoaDesfoque)
             bodyTag.appendChild(sendCoordButtonAdd);
@@ -463,7 +463,7 @@ async function editarDadosPessoa(idUtilizadorBd, nome, valencia, sala, aut, uten
     }       
 }
 
-async function enviarDadosPessoaDesfoque(fotoOriginal, nomeFotoFicheiro, utentesVerificar)
+async function enviarDadosPessoaDesfoque(fotoOriginal, nomeFotoFicheiro, utentesVerificar, utentesVerificados)
 {
     // esVerificar[i].bottom;
     //                             await enviarDadosPessoaDesfoque(fotoOriginal, nomeFotoFicheiro, absolutePath, faceLeft,faceTop,faceRight
@@ -477,6 +477,7 @@ async function enviarDadosPessoaDesfoque(fotoOriginal, nomeFotoFicheiro, utentes
         const localPub = document.getElementById('localPostagem').value;
         formDataDesfoquePessoa.append('local', localPub);
         formDataDesfoquePessoa.append('utentesPorVerificar', JSON.stringify(utentesVerificar))
+        formDataDesfoquePessoa.append('utentesVerificados', JSON.stringify(utentesVerificados))
         const apiURL = 'https://localhost:7248/Desfoque/RealizarDesfoque';
         const requestOptions = {
             method:'POST',
