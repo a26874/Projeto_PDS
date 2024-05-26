@@ -69,16 +69,53 @@ namespace ProjetoPDS.Controllers
 
         [HttpPost]
         [Route("RealizarDesfoque")]
-        public async Task<IActionResult> Desfoque([FromForm] string fotoOriginal, [FromForm] string nomeFotoFicheiro, [FromForm] string utentesPorVerificar)
+        public async Task<IActionResult> Desfoque([FromForm] string fotoOriginal, [FromForm] string nomeFotoFicheiro, [FromForm] string utentesPorVerificar, [FromForm] string local, [FromForm] string utentesVerificados)
         {
-            if (fotoOriginal == null)
+            if (fotoOriginal == null || utentesPorVerificar.Count() < 1 || utentesVerificados.Count()<1)
                 return BadRequest();
-
+            int numLocal = 0;
             FotoComDesfoque novoDesfoque = new FotoComDesfoque();
 
             List<UtenteVerificar> listaDesfoque = JsonConvert.DeserializeObject<List<UtenteVerificar>>(utentesPorVerificar);
+            List<UtenteIdentificado> listaDesfoqueVerificados = JsonConvert.DeserializeObject<List<UtenteIdentificado>>(utentesVerificados);
 
-            string fotoDesfocada= await novoDesfoque.AplicarDesfoque(fotoOriginal, nomeFotoFicheiro, listaDesfoque);
+            List<UtenteVerificar> auxListaDesfoque = novoDesfoque.VerificarAutorizacao(listaDesfoque);
+            List<UtenteIdentificado> auxListaDesfoqueVerificados = novoDesfoque.VerificarAutorizacaoVerificados(listaDesfoqueVerificados);
+
+
+            string auxNomeFicheiro = "";
+            if (local != null)
+            {
+                if (local == "EncEdc")
+                    numLocal = 1;
+                else if (local == "Sala")
+                    numLocal = 2;
+                else if (local == "Mural")
+                    numLocal = 3;
+                else if (local == "Chat")
+                    numLocal = 4;
+                else
+                    return BadRequest(string.Format("Não existe o local inserido: {0}", local));
+            }
+            string fotoDesfocada = "";
+            foreach(UtenteVerificar u in auxListaDesfoque)
+            {
+                fotoDesfocada = await novoDesfoque.AplicarDesfoque(fotoOriginal, nomeFotoFicheiro, auxListaDesfoque);
+            }
+
+            //foreach(UtenteIdentificado u in auxListaDesfoqueVerificados)
+            //{
+            //    if(u.Autorizacao < numLocal && u.Nome != null)
+            //    {
+            //        string nomeMinus = u.Nome.Replace(" ", "-");
+            //        auxNomeFicheiro = nomeFotoFicheiro + "_" + nomeMinus;
+            //        //checkar se existe na base de dados uma imagem ja com esse nome, para nao haver duplicatas, se tiver coloca um _2 tipo isto
+            //        fotoDesfocada = await novoDesfoque.AplicarDesfoque(fotoOriginal, nomeFotoFicheiro, auxListaDesfoque);
+            //        pathFotoDesfocada = novoDesfoque.AplicarDesfoque(fotoOriginal, pathImages + "\\" + auxNomeFicheiro + ".png"/*auxNomeFicheiro*/, listaDesfoque, utente.Nome);
+            //        nomeFicheiros.Add(string.Copy(pathFotoDesfocada));
+
+            //    }
+            //}
             var payloadFotoDesfocada = new
             {
                 pathFotoDesfocada = fotoDesfocada,

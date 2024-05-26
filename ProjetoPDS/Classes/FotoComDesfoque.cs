@@ -406,6 +406,32 @@ namespace ProjetoPDS.Classes
         }
 
         /// <summary>
+        /// Função para definir quais os utilizadores que necessitam de ser desfocados.
+        /// </summary>
+        /// <param name="utentesVerificar"></param>
+        /// <returns></returns>
+        public List<UtenteVerificar> VerificarAutorizacao(List<UtenteVerificar> utentesVerificar)
+        {
+            List<UtenteVerificar> utentesVerificarAux = new List<UtenteVerificar>();
+
+            foreach (UtenteVerificar u in utentesVerificar)
+                if (u.Autorizacao < 3)
+                    utentesVerificarAux.Add(u);
+
+            return utentesVerificarAux;
+        }
+
+        public List<UtenteIdentificado> VerificarAutorizacaoVerificados(List<UtenteIdentificado> utentesVerificados)
+        {
+            List<UtenteIdentificado> utentesVerificadosAux = new List<UtenteIdentificado>();
+
+            foreach (UtenteIdentificado u in utentesVerificados)
+                if (u.Autorizacao < 3)
+                    utentesVerificadosAux.Add(u);
+
+            return utentesVerificadosAux;
+        }
+        /// <summary>
         /// Função para dar shutdown no python
         /// </summary>
         public void ShutdownPython()

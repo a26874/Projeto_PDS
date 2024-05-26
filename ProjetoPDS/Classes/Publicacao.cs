@@ -7,7 +7,6 @@
 *	<description></description>
 **/
 
-using Microsoft.VisualBasic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 

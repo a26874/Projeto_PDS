@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using ProjetoPDS.Classes;
-using System.Drawing;
 
 namespace ProjetoPDS.Controllers
 {
