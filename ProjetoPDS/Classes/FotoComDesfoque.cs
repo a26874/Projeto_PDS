@@ -332,6 +332,43 @@ namespace ProjetoPDS.Classes
             }
             return fotoDesfocadaPath;
         }
+
+        /// <summary>
+        /// Desfoque para identificados.
+        /// </summary>
+        /// <param name="fotoOriginal"></param>
+        /// <param name="nomeFotoFicheiro"></param>
+        /// <param name="listaUtentes"></param>
+        /// <returns></returns>
+        public async Task<string> AplicarDesfoqueIdentificado(string fotoOriginal, string nomeFotoFicheiro, List<UtenteIdentificado> listaUtentes, string nomeUtente)
+        {
+            string auxNomeFotoFicheiro = Path.GetFileNameWithoutExtension(nomeFotoFicheiro);
+            auxNomeFotoFicheiro = auxNomeFotoFicheiro + nomeUtente;
+            bool firstIteration = true;
+            string fotoDesfocadaPath = "";
+            foreach (UtenteIdentificado u in listaUtentes)
+            {
+                if(u.Nome != nomeUtente)
+                {
+                    if (firstIteration)
+                    {
+                        string response = await pyController.CallPythonBlur(fotoOriginal, auxNomeFotoFicheiro, u.Left, u.Top, u.Right, u.Bottom);
+                        response = response.Trim('"');
+                        fotoDesfocadaPath = response.Replace(@"\\", @"\");
+                        firstIteration = false;
+                    }
+                    else
+                    {
+                        string response = await pyController.CallPythonBlur(fotoDesfocadaPath, auxNomeFotoFicheiro, u.Left, u.Top, u.Right, u.Bottom);
+                        response = response.Trim('"');
+                        fotoDesfocadaPath = response.Replace(@"\\", @"\");
+                        firstIteration = false;
+                    }
+                }
+            }
+            return fotoDesfocadaPath;
+        }
+
         /// <summary>
         /// Cria uma foto miniatura para cada uma das pessoas processadas.
         /// </summary>
@@ -405,22 +442,12 @@ namespace ProjetoPDS.Classes
             return novoListaUtentes;
         }
 
+        
         /// <summary>
-        /// Função para definir quais os utilizadores que necessitam de ser desfocados.
+        /// Verifica qual dos utilizadores irão necessitar de ser desfocados.
         /// </summary>
-        /// <param name="utentesVerificar"></param>
+        /// <param name="utentesVerificados"></param>
         /// <returns></returns>
-        public List<UtenteVerificar> VerificarAutorizacao(List<UtenteVerificar> utentesVerificar)
-        {
-            List<UtenteVerificar> utentesVerificarAux = new List<UtenteVerificar>();
-
-            foreach (UtenteVerificar u in utentesVerificar)
-                if (u.Autorizacao < 3)
-                    utentesVerificarAux.Add(u);
-
-            return utentesVerificarAux;
-        }
-
         public List<UtenteIdentificado> VerificarAutorizacaoVerificados(List<UtenteIdentificado> utentesVerificados)
         {
             List<UtenteIdentificado> utentesVerificadosAux = new List<UtenteIdentificado>();

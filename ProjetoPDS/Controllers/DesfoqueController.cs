@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using ProjetoPDS.Classes;
-using System.Drawing.Imaging;
-using System.Drawing.Printing;
 
 namespace ProjetoPDS.Controllers
 {
@@ -71,7 +69,7 @@ namespace ProjetoPDS.Controllers
         [Route("RealizarDesfoque")]
         public async Task<IActionResult> Desfoque([FromForm] string fotoOriginal, [FromForm] string nomeFotoFicheiro, [FromForm] string utentesPorVerificar, [FromForm] string local, [FromForm] string utentesVerificados)
         {
-            if (fotoOriginal == null || utentesPorVerificar.Count() < 1 || utentesVerificados.Count()<1)
+            if (fotoOriginal == null || utentesPorVerificar.Count() < 1 || utentesVerificados.Count() < 1)
                 return BadRequest();
             int numLocal = 0;
             FotoComDesfoque novoDesfoque = new FotoComDesfoque();
@@ -79,8 +77,6 @@ namespace ProjetoPDS.Controllers
             List<UtenteVerificar> listaDesfoque = JsonConvert.DeserializeObject<List<UtenteVerificar>>(utentesPorVerificar);
             List<UtenteIdentificado> listaDesfoqueVerificados = JsonConvert.DeserializeObject<List<UtenteIdentificado>>(utentesVerificados);
 
-            List<UtenteVerificar> auxListaDesfoque = novoDesfoque.VerificarAutorizacao(listaDesfoque);
-            List<UtenteIdentificado> auxListaDesfoqueVerificados = novoDesfoque.VerificarAutorizacaoVerificados(listaDesfoqueVerificados);
 
 
             string auxNomeFicheiro = "";
@@ -98,31 +94,34 @@ namespace ProjetoPDS.Controllers
                     return BadRequest(string.Format("Não existe o local inserido: {0}", local));
             }
             string fotoDesfocada = "";
-            foreach(UtenteVerificar u in auxListaDesfoque)
+            //Caso um utilizador não esteja identificado, ele é desfocado automaticamente.
+            foreach (UtenteVerificar u in listaDesfoque)
+                fotoDesfocada = await novoDesfoque.AplicarDesfoque(fotoOriginal, nomeFotoFicheiro, listaDesfoque);
+
+
+
+            List<UtenteIdentificado> auxListaDesfoqueVerificados = novoDesfoque.VerificarAutorizacaoVerificados(listaDesfoqueVerificados);
+
+            Dictionary<string, string> fotosDesfocadasEncEdc = new Dictionary<string, string>();
+            if (numLocal == 1)
             {
-                fotoDesfocada = await novoDesfoque.AplicarDesfoque(fotoOriginal, nomeFotoFicheiro, auxListaDesfoque);
+                string auxFotoEncEdc = "";
+                foreach (UtenteIdentificado u in auxListaDesfoqueVerificados)
+                {
+                    auxFotoEncEdc = await novoDesfoque.AplicarDesfoqueIdentificado(fotoDesfocada, nomeFotoFicheiro, auxListaDesfoqueVerificados, u.Nome);
+                    fotosDesfocadasEncEdc.Add(u.Nome,auxFotoEncEdc );
+                }
+                
             }
-
-            //foreach(UtenteIdentificado u in auxListaDesfoqueVerificados)
-            //{
-            //    if(u.Autorizacao < numLocal && u.Nome != null)
-            //    {
-            //        string nomeMinus = u.Nome.Replace(" ", "-");
-            //        auxNomeFicheiro = nomeFotoFicheiro + "_" + nomeMinus;
-            //        //checkar se existe na base de dados uma imagem ja com esse nome, para nao haver duplicatas, se tiver coloca um _2 tipo isto
-            //        fotoDesfocada = await novoDesfoque.AplicarDesfoque(fotoOriginal, nomeFotoFicheiro, auxListaDesfoque);
-            //        pathFotoDesfocada = novoDesfoque.AplicarDesfoque(fotoOriginal, pathImages + "\\" + auxNomeFicheiro + ".png"/*auxNomeFicheiro*/, listaDesfoque, utente.Nome);
-            //        nomeFicheiros.Add(string.Copy(pathFotoDesfocada));
-
-            //    }
-            //}
+            
             var payloadFotoDesfocada = new
             {
+                pathFotosDesfocadasEncEdc = fotosDesfocadasEncEdc,
                 pathFotoDesfocada = fotoDesfocada,
             };
             return Ok(payloadFotoDesfocada);
         }
 
-        
+
     }
 }

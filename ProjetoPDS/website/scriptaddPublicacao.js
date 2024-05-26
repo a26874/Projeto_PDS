@@ -488,6 +488,8 @@ async function enviarDadosPessoaDesfoque(fotoOriginal, nomeFotoFicheiro, utentes
         const data = await response.json();
         const nomeFicheiros = data.value;
         const fotoDesfocada = data.pathFotoDesfocada;
+        const fotosDesfocadas = data.pathFotosDesfocadasEncEdc;
+
         div = document.getElementById("Desfocagem");
         //se a div estiver vazia remove tudo de dentro
         if(div.firstChild !== null){
@@ -495,10 +497,24 @@ async function enviarDadosPessoaDesfoque(fotoOriginal, nomeFotoFicheiro, utentes
                 div.removeChild(div.firstChild);
             }
         }
-        const imgDesfocada = document.createElement('img');
-        auxFotoDesfocada = getRelativePath(fotoDesfocada)
-        imgDesfocada.src = auxFotoDesfocada;
-        div.appendChild(imgDesfocada)
+        for (let i = 0; i < Object.keys(fotosDesfocadas).length; i++)
+            {
+                const key = Object.keys(fotosDesfocadas)[i];
+                const value = fotosDesfocadas[key];
+
+                const paragraphDesfocadaEncEdc = document.createElement('p');
+                paragraphDesfocadaEncEdc.setAttribute('id', 'pFotoNr' + (i + 1));
+                paragraphDesfocadaEncEdc.innerHTML = 'Foto ' + key;
+                
+                const imgDesfocadaEncEdc = document.createElement('img');
+                const auxFotoDesfocadaEncEdc = getRelativePath(value);
+                imgDesfocadaEncEdc.setAttribute('id', 'fotoNr' + (i + 1));
+                imgDesfocadaEncEdc.src = auxFotoDesfocadaEncEdc;
+                
+                div.appendChild(paragraphDesfocadaEncEdc);
+                div.appendChild(imgDesfocadaEncEdc);
+            }
+
         // nomeFicheiros.forEach(ficheiro => {
         //     const img = document.createElement('img');
         //     const fileName = ficheiro.split('/').pop();
