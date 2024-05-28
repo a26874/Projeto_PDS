@@ -5,9 +5,9 @@
 
 ### API:
 <ol>
-<li>Começar por fazer clone do projeto na branch "VersaoFinal".</li>
-<li>Fazer instalação dos packages no ficheiro packages.txt.</li>
-<li>Inicializar o projeto por https. </li>
+	<li>Começar por fazer clone do projeto na branch "VersaoFinal".</li>
+	<li>Fazer instalação dos packages no ficheiro packages.txt.</li>
+	<li>Inicializar o projeto por https. </li>
 </ol>
 
 ### Website:
@@ -21,7 +21,7 @@
 ### FaceRecognition:
 
 <ol>
-	<li>Instalar os packages no ficheiro requirements.txt </li>
+	<li>Instalar os packages no ficheiro requirements.txt, abrir o terminal do vs code e usar o comando:  "pip install -r requirements. txt" </li>
 	<li>Abrir a pasta "FaceRecognition" no visual code. </li>
 	<li>Executar o ficheiro main.py </li>
 </ol>
