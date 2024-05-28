@@ -344,26 +344,18 @@ namespace ProjetoPDS.Classes
         {
             string auxNomeFotoFicheiro = Path.GetFileNameWithoutExtension(nomeFotoFicheiro);
             auxNomeFotoFicheiro = auxNomeFotoFicheiro + nomeUtente;
-            bool firstIteration = true;
             string fotoDesfocadaPath = "";
             foreach (UtenteIdentificado u in listaUtentes)
             {
-                if(u.Nome != nomeUtente)
+                if (u.Nome == nomeUtente)
                 {
-                    if (firstIteration)
-                    {
-                        string response = await pyController.CallPythonBlur(fotoOriginal, auxNomeFotoFicheiro, u.Left, u.Top, u.Right, u.Bottom);
-                        response = response.Trim('"');
-                        fotoDesfocadaPath = response.Replace(@"\\", @"\");
-                        firstIteration = false;
-                    }
-                    else
-                    {
-                        string response = await pyController.CallPythonBlur(fotoDesfocadaPath, auxNomeFotoFicheiro, u.Left, u.Top, u.Right, u.Bottom);
-                        response = response.Trim('"');
-                        fotoDesfocadaPath = response.Replace(@"\\", @"\");
-                        firstIteration = false;
-                    }
+                    continue;
+                }
+                else
+                {
+                    string response = await pyController.CallPythonBlur(fotoOriginal, auxNomeFotoFicheiro, u.Left, u.Top, u.Right, u.Bottom);
+                    response = response.Trim('"');
+                    fotoDesfocadaPath = response.Replace(@"\\", @"\");
                 }
             }
             return fotoDesfocadaPath;

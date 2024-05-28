@@ -371,8 +371,8 @@ document.getElementById('addPublicacao').addEventListener('submit', async functi
             Desfocagem.id = "Desfocagem";
             Desfocagem.style.display = "flex";
             Desfocagem.style.flexDirection = "column";
+            Desfocagem.style.width = "25%";
             bodyTag.appendChild(Desfocagem);
-            // bodyTag.appendChild(sendCoordButton);
             buttonCreated = true; 
         }
     } catch (error) {
@@ -465,9 +465,6 @@ async function editarDadosPessoa(idUtilizadorBd, nome, valencia, sala, aut, uten
 
 async function enviarDadosPessoaDesfoque(fotoOriginal, nomeFotoFicheiro, utentesVerificar, utentesVerificados)
 {
-    // esVerificar[i].bottom;
-    //                             await enviarDadosPessoaDesfoque(fotoOriginal, nomeFotoFicheiro, absolutePath, faceLeft,faceTop,faceRight
-    //                                 ,faceBottom);       
     alert('Estou a desfocar pessoas.')
     try
     {

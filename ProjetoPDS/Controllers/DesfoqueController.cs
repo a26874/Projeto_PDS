@@ -103,17 +103,25 @@ namespace ProjetoPDS.Controllers
             List<UtenteIdentificado> auxListaDesfoqueVerificados = novoDesfoque.VerificarAutorizacaoVerificados(listaDesfoqueVerificados);
 
             Dictionary<string, string> fotosDesfocadasEncEdc = new Dictionary<string, string>();
-            if (numLocal == 1)
+            string auxFotoEncEdc = "";
+            if (fotoDesfocada == "") fotoDesfocada = fotoOriginal;
+
+            List<UtenteIdentificado> utentesDesfoqueVerificado = new List<UtenteIdentificado>();
+
+            foreach (UtenteIdentificado u in auxListaDesfoqueVerificados)
             {
-                string auxFotoEncEdc = "";
-                foreach (UtenteIdentificado u in auxListaDesfoqueVerificados)
+                if (u.Autorizacao < numLocal)
                 {
-                    auxFotoEncEdc = await novoDesfoque.AplicarDesfoqueIdentificado(fotoDesfocada, nomeFotoFicheiro, auxListaDesfoqueVerificados, u.Nome);
-                    fotosDesfocadasEncEdc.Add(u.Nome,auxFotoEncEdc );
+                    utentesDesfoqueVerificado.Add(u);
                 }
-                
             }
-            
+
+            foreach (UtenteIdentificado u in utentesDesfoqueVerificado)
+            {
+                auxFotoEncEdc = await novoDesfoque.AplicarDesfoqueIdentificado(fotoDesfocada, nomeFotoFicheiro, utentesDesfoqueVerificado, u.Nome);
+                fotosDesfocadasEncEdc.Add(u.Nome, auxFotoEncEdc);
+            }
+
             var payloadFotoDesfocada = new
             {
                 pathFotosDesfocadasEncEdc = fotosDesfocadasEncEdc,
